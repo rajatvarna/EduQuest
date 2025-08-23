@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import LessonComponent from './components/Lesson';
 import SubscriptionModal from './components/SubscriptionModal';
+import Auth from './components/Auth';
 
 const App: React.FC = () => {
   const [userStats, setUserStats] = useState<UserStats>({
@@ -14,10 +15,21 @@ const App: React.FC = () => {
     hearts: 5,
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const course: Course = courseData;
+
+  const handleLogin = () => {
+    // In a real app, this would involve an API call
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    // Optionally reset user stats or fetch for a new user
+  };
 
   const startLesson = (lesson: Lesson) => {
     if (userStats.hearts > 0) {
@@ -62,25 +74,31 @@ const App: React.FC = () => {
 
   return (
     <div className="font-sans antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
-      <Header userStats={userStats} />
-      <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-4xl">
-        {activeLesson ? (
-          <LessonComponent
-            lesson={activeLesson}
-            userHearts={userStats.hearts}
-            onAnswer={handleAnswer}
-            onComplete={completeLesson}
-            onExit={exitLesson}
+      {!isAuthenticated ? (
+        <Auth onLogin={handleLogin} />
+      ) : (
+        <>
+          <Header userStats={userStats} onLogout={handleLogout} />
+          <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-4xl">
+            {activeLesson ? (
+              <LessonComponent
+                lesson={activeLesson}
+                userHearts={userStats.hearts}
+                onAnswer={handleAnswer}
+                onComplete={completeLesson}
+                onExit={exitLesson}
+              />
+            ) : (
+              <Dashboard course={course} onStartLesson={startLesson} userHearts={userStats.hearts} />
+            )}
+          </main>
+          <SubscriptionModal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)}
+            onSubscribe={refillHearts}
           />
-        ) : (
-          <Dashboard course={course} onStartLesson={startLesson} userHearts={userStats.hearts} />
-        )}
-      </main>
-      <SubscriptionModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        onSubscribe={refillHearts}
-      />
+        </>
+      )}
     </div>
   );
 };
