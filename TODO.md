@@ -55,20 +55,20 @@ This phase focuses on building the user-facing application and connecting it to 
 These tasks are priorities for evolving the application after the initial foundation is built.
 
 - [ ] **Gamification Logic:**
-    - Implement backend logic for daily streak tracking (e.g., daily cron job).
-    - Implement backend logic for heart replenishment over time.
-    - Add more dynamic UI feedback for earning points and streak increases.
+    - [ ] Implement backend logic for daily streak tracking (e.g., daily cron job).
+    - [ ] Implement backend logic for heart replenishment over time.
+    - [x] **Add more dynamic UI feedback for earning points and streak increases.**
 - [ ] **User Profile:**
-    - Create a dedicated User Profile page.
-    - Allow users to view stats, change their display name, and update their avatar.
+    - [ ] Create a dedicated User Profile page.
+    - [ ] Allow users to view stats, change their display name, and update their avatar.
 - [ ] **Content Management:**
-    - Implement a backend system for creating and managing courses, lessons, and questions.
-    - Expand lesson types to include 'READING' and 'VIDEO' content.
+    - [ ] Implement a backend system for creating and managing courses, lessons, and questions.
+    - [ ] Expand lesson types to include 'READING' and 'VIDEO' content.
 - [ ] **User Progress:**
-    - Implement the `user_progress` data model from the PDF (using JSONB) to track progress.
-    - Visually indicate completed lessons on the `Dashboard`.
+    - [ ] Implement the `user_progress` data model from the PDF (using JSONB) to track progress.
+    - [x] **Visually indicate completed lessons on the `CourseView`.**
 - [ ] **Payment Integration:**
-    - Integrate with a payment provider like Stripe (for web) or RevenueCat (for mobile) to handle subscriptions.
+    - [ ] Integrate with a payment provider like Stripe (for web) or RevenueCat (for mobile) to handle subscriptions.
 - [ ] **Deployment:**
-    - Set up a production-ready environment on AWS.
-    - Deploy the complete MVP.
+    - [ ] Set up a production-ready environment on AWS.
+    - [ ] Deploy the complete MVP.

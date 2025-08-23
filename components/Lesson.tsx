@@ -7,11 +7,12 @@ interface LessonProps {
   lesson: Lesson;
   userHearts: number;
   onAnswer: (isCorrect: boolean) => void;
-  onComplete: (pointsEarned: number) => void;
+  onComplete: (lessonId: string) => void;
   onExit: () => void;
+  isCompleted: boolean;
 }
 
-const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onComplete, onExit }) => {
+const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onComplete, onExit, isCompleted }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
@@ -29,7 +30,12 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
   const handleCheckAnswer = () => {
     if (selectedAnswer === null) return;
     setIsAnswerChecked(true);
-    onAnswer(isCorrect);
+    // Don't charge hearts for reviewing a completed lesson
+    if (!isCorrect && !isCompleted) {
+        onAnswer(false);
+    } else if (isCorrect) {
+        onAnswer(true);
+    }
   };
 
   const handleNext = () => {
@@ -38,7 +44,7 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
       setSelectedAnswer(null);
       setIsAnswerChecked(false);
     } else {
-      onComplete(lesson.questions.length * 10); // 10 points per question
+      onComplete(lesson.id);
     }
   };
 
@@ -58,7 +64,7 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
     return 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 opacity-50';
   };
   
-  const noHeartsLeft = userHearts === 0 && !isCorrect && isAnswerChecked;
+  const noHeartsLeft = userHearts === 0 && !isCorrect && isAnswerChecked && !isCompleted;
 
   return (
     <div className="flex flex-col h-full">

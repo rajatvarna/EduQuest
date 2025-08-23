@@ -8,6 +8,7 @@ import LessonComponent from './components/Lesson';
 import SubscriptionModal from './components/SubscriptionModal';
 import Auth from './components/Auth';
 import AdminDashboard from './components/AdminDashboard';
+import LessonCompleteModal from './components/LessonCompleteModal';
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin';
 
@@ -20,10 +21,13 @@ const App: React.FC = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [view, setView] = useState<View>('course_selection');
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lessonCompleteData, setLessonCompleteData] = useState<{ pointsEarned: number } | null>(null);
+
 
   const handleLogin = () => setIsAuthenticated(true);
   const handleLogout = () => setIsAuthenticated(false);
@@ -40,7 +44,7 @@ const App: React.FC = () => {
   };
 
   const startLesson = (lesson: Lesson) => {
-    if (userStats.hearts > 0) {
+    if (userStats.hearts > 0 || completedLessonIds.has(lesson.id)) {
       setActiveLesson(lesson);
       setView('lesson');
     } else {
@@ -62,15 +66,30 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const completeLesson = useCallback((pointsEarned: number) => {
-    setUserStats(prev => ({
-      ...prev,
-      points: prev.points + pointsEarned,
-      streak: prev.streak + 1, // Simplified streak logic
-    }));
+  const completeLesson = useCallback((lessonId: string) => {
+    const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
+    if (!lesson) return;
+
+    const pointsEarned = lesson.questions.length * 10;
+    
+    // Only update streak and completed status if it's a new completion
+    if (!completedLessonIds.has(lessonId)) {
+        setUserStats(prev => ({
+            ...prev,
+            points: prev.points + pointsEarned,
+            streak: prev.streak + 1, 
+        }));
+        setCompletedLessonIds(prev => new Set(prev).add(lessonId));
+    }
+    
+    setLessonCompleteData({ pointsEarned });
     setActiveLesson(null);
+  }, [activeCourse, completedLessonIds]);
+
+  const handleCloseCompleteModal = () => {
+    setLessonCompleteData(null);
     setView('course_view');
-  }, []);
+  }
 
   const exitLesson = () => {
     setActiveLesson(null);
@@ -96,7 +115,13 @@ const App: React.FC = () => {
             handleNavigateHome(); // Should not happen, but as a fallback
             return null;
         }
-        return <CourseView course={activeCourse} onStartLesson={startLesson} userHearts={userStats.hearts} onBack={handleNavigateHome} />;
+        return <CourseView 
+            course={activeCourse} 
+            onStartLesson={startLesson} 
+            userHearts={userStats.hearts} 
+            onBack={handleNavigateHome}
+            completedLessonIds={completedLessonIds}
+        />;
       case 'lesson':
         if (!activeLesson) {
             exitLesson(); // Should not happen
@@ -108,6 +133,7 @@ const App: React.FC = () => {
           onAnswer={handleAnswer}
           onComplete={completeLesson}
           onExit={exitLesson}
+          isCompleted={completedLessonIds.has(activeLesson.id)}
         />;
        case 'admin':
          return <AdminDashboard onCourseCreated={handleCourseCreated} />;
@@ -136,6 +162,14 @@ const App: React.FC = () => {
             onClose={() => setIsModalOpen(false)}
             onSubscribe={refillHearts}
           />
+          {lessonCompleteData && (
+            <LessonCompleteModal 
+              isOpen={!!lessonCompleteData}
+              onClose={handleCloseCompleteModal}
+              pointsEarned={lessonCompleteData.pointsEarned}
+              currentStreak={userStats.streak}
+            />
+          )}
         </>
       )}
     </div>
