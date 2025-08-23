@@ -95,24 +95,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCourseCreated }) => {
       const responseSchema = {
           type: Type.OBJECT,
           properties: {
-            title: { type: Type.STRING },
+            title: { type: Type.STRING, description: "A concise, engaging title for the entire course." },
             lessons: {
               type: Type.ARRAY,
+              description: "An array of lessons, one for each major section or chapter identified in the text.",
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  title: { type: Type.STRING },
+                  title: { type: Type.STRING, description: "A clear, descriptive title for this lesson, based on its section." },
                   questions: {
                     type: Type.ARRAY,
+                    description: "An array of 3 to 5 multiple-choice questions for this lesson.",
                     items: {
                       type: Type.OBJECT,
                       properties: {
-                        text: { type: Type.STRING },
+                        text: { type: Type.STRING, description: "The text of the question." },
                         options: {
                           type: Type.ARRAY,
+                          description: "An array of exactly 4 string options for the question.",
                           items: { type: Type.STRING },
                         },
-                        correctAnswerIndex: { type: Type.INTEGER },
+                        correctAnswerIndex: { type: Type.INTEGER, description: "The 0-indexed integer of the correct answer in the options array." },
                       },
                       required: ['text', 'options', 'correctAnswerIndex'],
                     },
@@ -125,11 +128,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCourseCreated }) => {
           required: ['title', 'lessons'],
       };
 
-      const prompt = `Based on the following content, generate a short educational course. The course should have a concise, engaging title and one lesson. The lesson should also have a title and contain exactly 5 multiple-choice questions that test the main concepts of the text. Each question must have 4 options and a correct answer index (0-3).
+      const prompt = `You are an expert instructional designer tasked with converting raw text into a structured mini-course for an EdTech platform.
 
-Content:
+Analyze the following content and identify its main sections or chapters. Create a comprehensive course based on this structure.
+
+Your output must be a single JSON object with the following schema:
+1.  A concise, engaging 'title' for the entire course.
+2.  An array of 'lessons', one for each major section you identify.
+3.  Each lesson object in the array must have:
+    a. A clear, descriptive 'title'.
+    b. An array of 3 to 5 multiple-choice 'questions' that test the key concepts from that section.
+4.  Each question object must have:
+    a. The question 'text'.
+    b. An array of exactly 4 string 'options'.
+    c. The 'correctAnswerIndex' (an integer from 0 to 3).
+
+Do not include any markdown formatting like \`\`\`json in your response.
+
+Content to analyze:
 ---
-${contentToProcess}
+${contentToProcess.substring(0, 20000)}
 ---
 `;
 
