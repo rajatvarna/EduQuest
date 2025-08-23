@@ -12,15 +12,19 @@ interface LessonProps {
   isCompleted: boolean;
 }
 
-const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onComplete, onExit, isCompleted }) => {
+const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onComplete, onExit, isCompleted }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
 
-  const currentQuestion = lesson.questions[currentIndex];
-  const isCorrect = selectedAnswer === currentQuestion.correctAnswerIndex;
+  const currentQuestion = lesson.questions?.[currentIndex];
+  const isCorrect = selectedAnswer === currentQuestion?.correctAnswerIndex;
 
-  const progress = useMemo(() => ((currentIndex) / lesson.questions.length) * 100, [currentIndex, lesson.questions.length]);
+  const progress = useMemo(() => ((currentIndex) / (lesson.questions?.length || 1)) * 100, [currentIndex, lesson.questions?.length]);
+  
+  if (!currentQuestion) {
+      return <div>Loading question...</div>
+  }
 
   const handleSelectAnswer = (index: number) => {
     if (isAnswerChecked) return;
@@ -39,7 +43,7 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
   };
 
   const handleNext = () => {
-    if (currentIndex < lesson.questions.length - 1) {
+    if (lesson.questions && currentIndex < lesson.questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setSelectedAnswer(null);
       setIsAnswerChecked(false);
@@ -108,7 +112,7 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
                 disabled={noHeartsLeft}
                 className={`px-8 py-3 rounded-lg font-bold text-base transition ${isCorrect ? 'bg-white text-green-500 hover:bg-green-100' : 'bg-white text-red-500 hover:bg-red-100'} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {currentIndex < lesson.questions.length - 1 ? 'Next' : 'Finish'}
+                {lesson.questions && currentIndex < lesson.questions.length - 1 ? 'Next' : 'Finish'}
               </button>
             </div>
           </div>
@@ -130,4 +134,4 @@ const LessonComponent: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, 
   );
 };
 
-export default LessonComponent;
+export default QuizLesson;

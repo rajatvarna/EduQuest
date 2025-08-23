@@ -4,7 +4,9 @@ import { initialCourses } from './services/courseService';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
 import CourseView from './components/CourseView';
-import LessonComponent from './components/Lesson';
+import QuizLesson from './components/Lesson';
+import ReadingLesson from './components/ReadingLesson';
+import VideoLesson from './components/VideoLesson';
 import SubscriptionModal from './components/SubscriptionModal';
 import Auth from './components/Auth';
 import AdminDashboard from './components/AdminDashboard';
@@ -44,11 +46,12 @@ const App: React.FC = () => {
   };
 
   const startLesson = (lesson: Lesson) => {
-    if (userStats.hearts > 0 || completedLessonIds.has(lesson.id)) {
+    // Quizzes require hearts if not completed yet
+    if (lesson.type === 'QUIZ' && userStats.hearts <= 0 && !completedLessonIds.has(lesson.id)) {
+      setIsModalOpen(true);
+    } else {
       setActiveLesson(lesson);
       setView('lesson');
-    } else {
-      setIsModalOpen(true);
     }
   };
 
@@ -70,7 +73,12 @@ const App: React.FC = () => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
     if (!lesson) return;
 
-    const pointsEarned = lesson.questions.length * 10;
+    let pointsEarned = 0;
+    if (lesson.type === 'QUIZ' && lesson.questions) {
+      pointsEarned = lesson.questions.length * 10;
+    } else if (lesson.type === 'READING' || lesson.type === 'VIDEO') {
+      pointsEarned = 5; // A small reward for completing content
+    }
     
     // Only update streak and completed status if it's a new completion
     if (!completedLessonIds.has(lessonId)) {
@@ -80,6 +88,12 @@ const App: React.FC = () => {
             streak: prev.streak + 1, 
         }));
         setCompletedLessonIds(prev => new Set(prev).add(lessonId));
+    } else {
+      // If re-completing, just give points, no streak
+      setUserStats(prev => ({
+          ...prev,
+          points: prev.points + pointsEarned,
+      }));
     }
     
     setLessonCompleteData({ pointsEarned });
@@ -127,14 +141,32 @@ const App: React.FC = () => {
             exitLesson(); // Should not happen
             return null;
         }
-        return <LessonComponent
-          lesson={activeLesson}
-          userHearts={userStats.hearts}
-          onAnswer={handleAnswer}
-          onComplete={completeLesson}
-          onExit={exitLesson}
-          isCompleted={completedLessonIds.has(activeLesson.id)}
-        />;
+        switch(activeLesson.type) {
+          case 'QUIZ':
+            return <QuizLesson
+              lesson={activeLesson}
+              userHearts={userStats.hearts}
+              onAnswer={handleAnswer}
+              onComplete={completeLesson}
+              onExit={exitLesson}
+              isCompleted={completedLessonIds.has(activeLesson.id)}
+            />;
+          case 'READING':
+            return <ReadingLesson
+              lesson={activeLesson}
+              onComplete={completeLesson}
+              onExit={exitLesson}
+            />;
+          case 'VIDEO':
+            return <VideoLesson
+              lesson={activeLesson}
+              onComplete={completeLesson}
+              onExit={exitLesson}
+            />;
+          default:
+            exitLesson();
+            return null;
+        }
        case 'admin':
          return <AdminDashboard onCourseCreated={handleCourseCreated} />;
       default:

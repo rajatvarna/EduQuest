@@ -15,8 +15,10 @@ export interface Question {
 export interface Lesson {
   id: string;
   title: string;
-  type: 'QUIZ';
-  questions: Question[];
+  type: 'QUIZ' | 'READING' | 'VIDEO';
+  questions?: Question[];
+  content?: string; // For READING type
+  videoId?: string; // For VIDEO type (e.g., YouTube video ID)
 }
 
 export interface Course {

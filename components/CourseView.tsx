@@ -1,6 +1,6 @@
 import React from 'react';
 import { Course, Lesson } from '../types';
-import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon } from './icons';
+import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon, QuestionMarkCircleIcon, DocumentTextIcon, VideoCameraIcon } from './icons';
 
 interface CourseViewProps {
   course: Course;
@@ -11,6 +11,33 @@ interface CourseViewProps {
 }
 
 const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHearts, onBack, completedLessonIds }) => {
+
+  const getLessonIcon = (lessonType: Lesson['type']) => {
+    switch (lessonType) {
+      case 'QUIZ':
+        return <QuestionMarkCircleIcon className="w-6 h-6 text-white" />;
+      case 'READING':
+        return <DocumentTextIcon className="w-6 h-6 text-white" />;
+      case 'VIDEO':
+        return <VideoCameraIcon className="w-6 h-6 text-white" />;
+      default:
+        return null;
+    }
+  };
+  
+  const getLessonDescription = (lessonType: Lesson['type']) => {
+      switch (lessonType) {
+          case 'QUIZ':
+            return 'Challenge yourself with a new quiz.';
+          case 'READING':
+            return 'Read through this essential material.';
+          case 'VIDEO':
+            return 'Watch this short, informative video.';
+          default:
+            return '';
+      }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="relative text-center">
@@ -25,32 +52,35 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
         <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
 
         <ul className="space-y-10">
-          {course.lessons.map((lesson, index) => {
+          {course.lessons.map((lesson) => {
             const isCompleted = completedLessonIds.has(lesson.id);
+            const isQuiz = lesson.type === 'QUIZ';
+            const isLocked = isQuiz && userHearts === 0 && !isCompleted;
+
             return (
               <li key={lesson.id} className="relative">
-                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold border-4 border-slate-50 dark:border-slate-900 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
-                      {isCompleted ? <CheckCircleIcon className="w-6 h-6" fill="none" stroke="currentColor" /> : index + 1}
+                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-slate-50 dark:border-slate-900 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
+                      {isCompleted ? <CheckCircleIcon className="w-6 h-6 text-white" fill="none" stroke="currentColor"/> : getLessonIcon(lesson.type)}
                   </div>
                   <div className={`ml-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-700 ${isCompleted ? 'opacity-70' : ''}`}>
                       <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
-                      <p className="text-slate-500 dark:text-slate-400 mt-1">Challenge yourself with a new quiz.</p>
+                      <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
                       <button
                           onClick={() => onStartLesson(lesson)}
-                          disabled={userHearts === 0 && !isCompleted}
+                          disabled={isLocked}
                           className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
                       >
                           {isCompleted ? (
                              <>
                                <ArrowPathIcon className="w-5 h-5 mr-2"/> Review
                              </>
-                          ) : userHearts > 0 ? (
+                          ) : isLocked ? (
                              <>
-                               <PlayCircleIcon className="w-5 h-5 mr-2"/> Start
+                                <LockClosedIcon className="w-5 h-5 mr-2"/> No Hearts
                              </>
                           ) : (
                              <>
-                                <LockClosedIcon className="w-5 h-5 mr-2"/> No Hearts
+                               <PlayCircleIcon className="w-5 h-5 mr-2"/> Start
                              </>
                           )}
                       </button>

@@ -63,7 +63,7 @@ These tasks are priorities for evolving the application after the initial founda
     - [ ] Allow users to view stats, change their display name, and update their avatar.
 - [ ] **Content Management:**
     - [ ] Implement a backend system for creating and managing courses, lessons, and questions.
-    - [ ] Expand lesson types to include 'READING' and 'VIDEO' content.
+    - [x] **Expand lesson types to include 'READING' and 'VIDEO' content.**
 - [ ] **User Progress:**
     - [ ] Implement the `user_progress` data model from the PDF (using JSONB) to track progress.
     - [x] **Visually indicate completed lessons on the `CourseView`.**
