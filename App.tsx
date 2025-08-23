@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Course, Lesson, UserStats, User } from './types';
-import { initialCourses } from './services/courseService';
+import * as api from './services/api';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
 import CourseView from './components/CourseView';
@@ -17,15 +17,10 @@ type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
-  const [userStats, setUserStats] = useState<UserStats>({
-    points: 120,
-    streak: 3,
-    hearts: 5,
-  });
-
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
   const [view, setView] = useState<View>('course_selection');
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
@@ -33,13 +28,40 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lessonCompleteData, setLessonCompleteData] = useState<{ pointsEarned: number } | null>(null);
   const [theme, setTheme] = useState<Theme>('light');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     setTheme(initialTheme);
+
+    const checkSession = async () => {
+        setIsLoading(true);
+        try {
+            const data = await api.getMe();
+            if (data) {
+                setUser(data.user);
+                setUserStats(data.userStats);
+                setCompletedLessonIds(new Set(data.completedLessonIds));
+                setIsAuthenticated(true);
+            }
+        } catch (error) {
+            console.log("No active session");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    checkSession();
   }, []);
+  
+  useEffect(() => {
+      const fetchCourses = async () => {
+          const fetchedCourses = await api.getCourses();
+          setCourses(fetchedCourses);
+      };
+      fetchCourses();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -54,13 +76,30 @@ const App: React.FC = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
-  const handleLogin = () => {
+  const handleLogin = async (credentials: Pick<User, 'email' | 'password'>) => {
+      const data = await api.login(credentials.email, credentials.password!);
+      setUser(data.user);
+      setUserStats(data.userStats);
+      setCompletedLessonIds(new Set(data.completedLessonIds));
       setIsAuthenticated(true);
-      setUser({ id: 'user-1', name: 'Alex Doe', email: 'alex.doe@example.com' });
   }
+
+  const handleRegister = async (credentials: Pick<User, 'name' | 'email' | 'password'>) => {
+    const data = await api.register(credentials);
+    setUser(data.user);
+    setUserStats(data.userStats);
+    setCompletedLessonIds(new Set());
+    setIsAuthenticated(true);
+  }
+  
   const handleLogout = () => {
+      api.logout();
       setIsAuthenticated(false);
       setUser(null);
+      setUserStats(null);
+      setActiveCourse(null);
+      setActiveLesson(null);
+      setView('course_selection');
   }
   
   const handleNavigateHome = () => {
@@ -76,7 +115,7 @@ const App: React.FC = () => {
 
   const startLesson = (lesson: Lesson) => {
     // Quizzes require hearts if not completed yet
-    if (lesson.type === 'QUIZ' && userStats.hearts <= 0 && !completedLessonIds.has(lesson.id)) {
+    if (userStats && lesson.type === 'QUIZ' && userStats.hearts <= 0 && !completedLessonIds.has(lesson.id)) {
       setIsModalOpen(true);
     } else {
       setActiveLesson(lesson);
@@ -85,10 +124,12 @@ const App: React.FC = () => {
   };
 
   const handleAnswer = useCallback((isCorrect: boolean) => {
+    if (!userStats) return;
     if (isCorrect) {
-      setUserStats(prev => ({ ...prev, points: prev.points + 10 }));
+      setUserStats(prev => prev ? ({ ...prev, points: prev.points + 10 }) : null);
     } else {
       setUserStats(prev => {
+        if (!prev) return null;
         const newHearts = Math.max(0, prev.hearts - 1);
         if (newHearts === 0) {
           setIsModalOpen(true);
@@ -96,38 +137,34 @@ const App: React.FC = () => {
         return { ...prev, hearts: newHearts };
       });
     }
-  }, []);
+  }, [userStats]);
 
-  const completeLesson = useCallback((lessonId: string) => {
+  const completeLesson = useCallback(async (lessonId: string) => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
-    if (!lesson) return;
+    if (!lesson || !user || !userStats) return;
 
     let pointsEarned = 0;
     if (lesson.type === 'QUIZ' && lesson.questions) {
       pointsEarned = lesson.questions.length * 10;
     } else if (lesson.type === 'READING' || lesson.type === 'VIDEO') {
-      pointsEarned = 5; // A small reward for completing content
+      pointsEarned = 5;
     }
     
-    // Only update streak and completed status if it's a new completion
-    if (!completedLessonIds.has(lessonId)) {
-        setUserStats(prev => ({
-            ...prev,
-            points: prev.points + pointsEarned,
-            streak: prev.streak + 1, 
-        }));
-        setCompletedLessonIds(prev => new Set(prev).add(lessonId));
-    } else {
-      // If re-completing, just give points, no streak
-      setUserStats(prev => ({
-          ...prev,
-          points: prev.points + pointsEarned,
-      }));
-    }
+    const wasAlreadyCompleted = completedLessonIds.has(lessonId);
+    
+    const { updatedUserStats, updatedCompletedLessonIds } = await api.completeLesson({
+        userId: user.id,
+        lessonId,
+        pointsEarned,
+        wasAlreadyCompleted
+    });
+
+    setUserStats(updatedUserStats);
+    setCompletedLessonIds(new Set(updatedCompletedLessonIds));
     
     setLessonCompleteData({ pointsEarned });
     setActiveLesson(null);
-  }, [activeCourse, completedLessonIds]);
+  }, [activeCourse, completedLessonIds, user, userStats]);
 
   const handleCloseCompleteModal = () => {
     setLessonCompleteData(null);
@@ -139,18 +176,30 @@ const App: React.FC = () => {
     setView('course_view');
   };
   
-  const handleCourseCreated = (newCourse: Course) => {
-    setCourses(prev => [...prev, newCourse]);
+  const handleCourseCreated = async (newCourse: Course) => {
+    await api.createCourse(newCourse);
+    const updatedCourses = await api.getCourses();
+    setCourses(updatedCourses);
     setView('course_selection');
   }
 
-  const handleUpdateUser = (updatedUser: User) => {
-    setUser(updatedUser);
+  const handleUpdateUser = async (updatedUser: User) => {
+    const savedUser = await api.updateUser(updatedUser);
+    setUser(savedUser);
   };
 
   const refillHearts = () => {
-    setUserStats(prev => ({...prev, hearts: 5}));
+    if (!userStats) return;
+    setUserStats(prev => prev ? ({...prev, hearts: 5}) : null);
     setIsModalOpen(false);
+  }
+  
+  if (isLoading) {
+      return (
+          <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950">
+              <div className="w-16 h-16 border-4 border-teal-500 border-dashed rounded-full animate-spin"></div>
+          </div>
+      )
   }
 
   const renderContent = () => {
@@ -158,7 +207,7 @@ const App: React.FC = () => {
       case 'course_selection':
         return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} />;
       case 'course_view':
-        if (!activeCourse) {
+        if (!activeCourse || !userStats) {
             handleNavigateHome(); // Should not happen, but as a fallback
             return null;
         }
@@ -170,7 +219,7 @@ const App: React.FC = () => {
             completedLessonIds={completedLessonIds}
         />;
       case 'lesson':
-        if (!activeLesson) {
+        if (!activeLesson || !userStats) {
             exitLesson(); // Should not happen
             return null;
         }
@@ -203,7 +252,7 @@ const App: React.FC = () => {
        case 'admin':
          return <AdminDashboard onCourseCreated={handleCourseCreated} />;
        case 'profile':
-         if (!user) {
+         if (!user || !userStats) {
              handleLogout(); // Should not happen if authenticated, but as fallback
              return null;
          }
@@ -222,8 +271,8 @@ const App: React.FC = () => {
   return (
     <div className="font-sans antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
       {!isAuthenticated ? (
-        <Auth onLogin={handleLogin} />
-      ) : (
+        <Auth onLogin={handleLogin} onRegister={handleRegister} />
+      ) : userStats ? (
         <>
           <Header 
             userStats={userStats} 
@@ -250,7 +299,7 @@ const App: React.FC = () => {
             />
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 };

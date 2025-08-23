@@ -9,6 +9,7 @@ export interface User {
   name: string;
   email: string;
   avatarUrl?: string;
+  password?: string;
 }
 
 export interface Question {
@@ -19,7 +20,7 @@ export interface Question {
 }
 
 export interface Lesson {
-  id: string;
+  id:string;
   title: string;
   type: 'QUIZ' | 'READING' | 'VIDEO';
   questions?: Question[];

@@ -43,10 +43,10 @@ This phase focuses on building the user-facing application and connecting it to 
 - [x] **Create Login/Signup screen:** The `Auth.tsx` component handles user registration and login forms.
 - [x] **Implement Social Login UI:** The `Auth.tsx` component includes UI for Google, Facebook, and GitHub sign-in.
 - [x] **Implement "Forgot Password" UI flow:** The `Auth.tsx` component includes a full UI flow for password reset.
-- [ ] **Connect to backend API:**
-    - Implement logic to call the `login` and `register` endpoints.
-    - Securely store the received JWT on the client.
-    - Implement a call to a protected endpoint (e.g., `/api/me`) to verify the end-to-end authentication flow.
+- [x] **Connect to backend API:**
+    - [x] Implement logic to call the `login` and `register` endpoints.
+    - [x] Securely store the received JWT on the client.
+    - [x] Implement a call to a protected endpoint (e.g., `/api/me`) to verify the end-to-end authentication flow.
 
 ---
 
@@ -60,7 +60,7 @@ These tasks are priorities for evolving the application after the initial founda
     - [x] **Add more dynamic UI feedback for earning points and streak increases.**
 - [ ] **User Profile:**
     - [x] Create a dedicated User Profile page.
-    - [x] Allow users to view stats, change their display name, and update their avatar (UI only).
+    - [x] Allow users to view stats, change their display name, and update their avatar (client-side implementation complete).
 - [ ] **Content Management:**
     - [ ] Implement a backend system for creating and managing courses, lessons, and questions.
     - [x] **Expand lesson types to include 'READING' and 'VIDEO' content.**

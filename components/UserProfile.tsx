@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, UserStats } from '../types';
 import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon } from './icons';
 
@@ -13,6 +13,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser, onLogout, onNavigateHome }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
       setName(user.name);
@@ -27,6 +28,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
       setName(user.name);
       setIsEditing(false);
   }
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdateUser({ ...user, avatarUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const StatCard: React.FC<{ icon: React.ReactNode; label: string; value: number; color: string; }> = ({ icon, label, value, color }) => (
     <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-xl flex items-center space-x-4">
@@ -52,12 +64,27 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
       <div className="bg-white dark:bg-slate-800/50 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row items-center sm:space-x-8">
             <div className="relative mb-6 sm:mb-0">
-                <div className="w-32 h-32 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
-                    <UserCircleIcon className="w-24 h-24 text-slate-400 dark:text-slate-500"/>
+                <div className="w-32 h-32 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserCircleIcon className="w-24 h-24 text-slate-400 dark:text-slate-500"/>
+                    )}
                 </div>
-                <button className="absolute bottom-1 right-1 bg-teal-500 text-white p-2 rounded-full hover:bg-teal-600 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-800 focus:ring-teal-500">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                    accept="image/*"
+                />
+                <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute bottom-1 right-1 bg-teal-500 text-white p-2 rounded-full hover:bg-teal-600 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-800 focus:ring-teal-500"
+                    aria-label="Change avatar"
+                    title="Change avatar"
+                >
                     <CameraIcon className="w-5 h-5"/>
-                    <span className="sr-only">Change avatar</span>
                 </button>
             </div>
 

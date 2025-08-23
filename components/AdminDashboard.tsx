@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import * as pdfjsLib from 'pdfjs-dist';
 import { Course, Question } from '../types';
+import * as api from '../services/api';
 import { PlusIcon, SparklesIcon, DocumentArrowUpIcon, XMarkIcon } from './icons';
 
 // Set workerSrc for pdfjs-dist
@@ -177,7 +178,7 @@ ${contentToProcess.substring(0, 20000)}
         })),
       };
 
-      onCourseCreated(newCourse);
+      await onCourseCreated(newCourse);
       
     } catch (e: any) {
       console.error(e);
