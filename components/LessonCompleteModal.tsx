@@ -13,7 +13,7 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
 
   return (
     <div 
-        className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         onClick={onClose}
     >
       <div
@@ -23,14 +23,14 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
         <h2 className="text-3xl font-bold text-teal-500 mb-4">Lesson Complete!</h2>
         
         <div className="space-y-4 my-6">
-            <div className="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg flex justify-between items-center">
+            <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
                 <span className="font-semibold text-slate-600 dark:text-slate-300">Points Earned</span>
                 <div className="flex items-center font-bold text-lg text-yellow-500">
                     <StarIcon className="w-6 h-6 mr-1" />
                     <span>+{pointsEarned}</span>
                 </div>
             </div>
-            <div className="bg-slate-100 dark:bg-slate-700 p-4 rounded-lg flex justify-between items-center">
+            <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
                 <span className="font-semibold text-slate-600 dark:text-slate-300">Daily Streak</span>
                 <div className="flex items-center font-bold text-lg text-orange-500">
                     <FlameIcon className="w-6 h-6 mr-1" />

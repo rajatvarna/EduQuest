@@ -59,8 +59,8 @@ These tasks are priorities for evolving the application after the initial founda
     - [ ] Implement backend logic for heart replenishment over time.
     - [x] **Add more dynamic UI feedback for earning points and streak increases.**
 - [ ] **User Profile:**
-    - [ ] Create a dedicated User Profile page.
-    - [ ] Allow users to view stats, change their display name, and update their avatar.
+    - [x] Create a dedicated User Profile page.
+    - [x] Allow users to view stats, change their display name, and update their avatar (UI only).
 - [ ] **Content Management:**
     - [ ] Implement a backend system for creating and managing courses, lessons, and questions.
     - [x] **Expand lesson types to include 'READING' and 'VIDEO' content.**

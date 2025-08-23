@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { Course, Lesson, UserStats } from './types';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Course, Lesson, UserStats, User } from './types';
 import { initialCourses } from './services/courseService';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
@@ -11,8 +11,10 @@ import SubscriptionModal from './components/SubscriptionModal';
 import Auth from './components/Auth';
 import AdminDashboard from './components/AdminDashboard';
 import LessonCompleteModal from './components/LessonCompleteModal';
+import UserProfile from './components/UserProfile';
 
-type View = 'course_selection' | 'course_view' | 'lesson' | 'admin';
+type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
+type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
   const [userStats, setUserStats] = useState<UserStats>({
@@ -21,6 +23,7 @@ const App: React.FC = () => {
     hearts: 5,
   });
 
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
@@ -29,10 +32,36 @@ const App: React.FC = () => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lessonCompleteData, setLessonCompleteData] = useState<{ pointsEarned: number } | null>(null);
+  const [theme, setTheme] = useState<Theme>('light');
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    setTheme(initialTheme);
+  }, []);
 
-  const handleLogin = () => setIsAuthenticated(true);
-  const handleLogout = () => setIsAuthenticated(false);
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const handleLogin = () => {
+      setIsAuthenticated(true);
+      setUser({ id: 'user-1', name: 'Alex Doe', email: 'alex.doe@example.com' });
+  }
+  const handleLogout = () => {
+      setIsAuthenticated(false);
+      setUser(null);
+  }
   
   const handleNavigateHome = () => {
       setActiveCourse(null);
@@ -115,6 +144,10 @@ const App: React.FC = () => {
     setView('course_selection');
   }
 
+  const handleUpdateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
   const refillHearts = () => {
     setUserStats(prev => ({...prev, hearts: 5}));
     setIsModalOpen(false);
@@ -169,6 +202,18 @@ const App: React.FC = () => {
         }
        case 'admin':
          return <AdminDashboard onCourseCreated={handleCourseCreated} />;
+       case 'profile':
+         if (!user) {
+             handleLogout(); // Should not happen if authenticated, but as fallback
+             return null;
+         }
+         return <UserProfile 
+            user={user}
+            userStats={userStats}
+            onUpdateUser={handleUpdateUser}
+            onLogout={handleLogout}
+            onNavigateHome={handleNavigateHome}
+         />;
       default:
         return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} />;
     }
@@ -182,9 +227,11 @@ const App: React.FC = () => {
         <>
           <Header 
             userStats={userStats} 
-            onLogout={handleLogout} 
             onNavigateToAdmin={() => setView('admin')}
             onNavigateHome={handleNavigateHome}
+            onNavigateToProfile={() => setView('profile')}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
           <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-4xl">
             {renderContent()}

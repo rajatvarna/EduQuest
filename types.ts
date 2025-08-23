@@ -1,8 +1,14 @@
-
 export interface UserStats {
   points: number;
   streak: number;
   hearts: number;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
 }
 
 export interface Question {

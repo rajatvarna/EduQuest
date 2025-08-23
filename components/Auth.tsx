@@ -164,9 +164,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     }
     
     return (
-        <div className="flex-grow flex items-center justify-center bg-slate-100 dark:bg-slate-900 p-4">
+        <div className="flex-grow flex items-center justify-center bg-gray-100 dark:bg-gray-900 bg-gradient-to-br from-teal-50 via-sky-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-slate-900 p-4">
             <div className="w-full max-w-md">
-                <div className="bg-white dark:bg-slate-800 shadow-2xl rounded-2xl p-8 min-h-[620px] flex flex-col justify-center">
+                <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-8 min-h-[620px] flex flex-col justify-center border border-slate-200/50 dark:border-slate-700/50">
                     {renderContent()}
                 </div>
             </div>

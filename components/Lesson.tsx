@@ -55,17 +55,17 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
   const getButtonClass = (index: number) => {
     if (!isAnswerChecked) {
       return selectedAnswer === index
-        ? 'bg-teal-200 dark:bg-teal-800 border-teal-500'
-        : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-300 dark:border-slate-600';
+        ? 'bg-teal-100 dark:bg-teal-900 border-teal-500 ring-2 ring-teal-500'
+        : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-slate-300 dark:border-slate-700';
     }
 
     if (index === currentQuestion.correctAnswerIndex) {
-      return 'bg-green-100 dark:bg-green-900 border-green-500 text-green-800 dark:text-green-200';
+      return 'bg-green-100 dark:bg-green-900/50 border-green-500 text-green-800 dark:text-green-200';
     }
     if (index === selectedAnswer) {
-      return 'bg-red-100 dark:bg-red-900 border-red-500 text-red-800 dark:text-red-200';
+      return 'bg-red-100 dark:bg-red-900/50 border-red-500 text-red-800 dark:text-red-200';
     }
-    return 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 opacity-50';
+    return 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 opacity-60';
   };
   
   const noHeartsLeft = userHearts === 0 && !isCorrect && isAnswerChecked && !isCompleted;
@@ -101,7 +101,7 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
       </div>
       
       {isAnswerChecked && (
-         <div className={`fixed bottom-0 left-0 right-0 p-4 text-white text-center font-bold ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+         <div className={`fixed bottom-0 left-0 right-0 p-4 text-white font-bold ${isCorrect ? 'bg-green-500/90' : 'bg-red-500/90'} backdrop-blur-sm`}>
             <div className="container mx-auto max-w-4xl flex items-center justify-between">
               <div className="flex items-center">
                 {isCorrect ? <CheckIcon className="w-8 h-8 mr-2"/> : <XMarkIcon className="w-8 h-8 mr-2"/>}
@@ -119,7 +119,7 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
       )}
 
       {!isAnswerChecked && (
-          <div className="p-4 border-t-2 border-slate-200 dark:border-slate-700">
+          <div className="p-4 border-t-2 border-slate-200 dark:border-slate-800">
              <button
                 onClick={handleCheckAnswer}
                 disabled={selectedAnswer === null}

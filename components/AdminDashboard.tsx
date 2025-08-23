@@ -190,10 +190,10 @@ ${contentToProcess.substring(0, 20000)}
   const TabButton: React.FC<{active: boolean, onClick: () => void, children: React.ReactNode}> = ({ active, onClick, children }) => (
     <button
       onClick={onClick}
-      className={`px-4 py-2 text-lg font-semibold rounded-t-lg transition-colors ${
+      className={`px-4 py-2 text-base font-semibold rounded-t-lg transition-colors border-b-2 ${
         active
-          ? 'bg-white dark:bg-slate-800 text-teal-500 border-b-2 border-teal-500'
-          : 'text-slate-500 dark:text-slate-400 hover:text-teal-500 dark:hover:text-teal-400'
+          ? 'text-teal-500 border-teal-500'
+          : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-teal-500 dark:hover:text-teal-400 hover:border-slate-300 dark:hover:border-slate-600'
       }`}
     >
       {children}
@@ -201,12 +201,12 @@ ${contentToProcess.substring(0, 20000)}
   );
 
   return (
-    <div className="p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-xl animate-fade-in">
+    <div className="p-8 bg-white dark:bg-slate-800/50 rounded-2xl shadow-xl animate-fade-in border border-slate-200 dark:border-slate-800">
       <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Admin Dashboard</h2>
       <p className="text-slate-500 dark:text-slate-400 mb-6">Create a new course using AI from text or a PDF document.</p>
 
         <div className="border-b border-slate-200 dark:border-slate-700 mb-6">
-            <nav className="-mb-px flex space-x-6">
+            <nav className="-mb-px flex space-x-4">
                 <TabButton active={mode === 'text'} onClick={() => setMode('text')}>Paste Text</TabButton>
                 <TabButton active={mode === 'pdf'} onClick={() => setMode('pdf')}>Upload PDF</TabButton>
             </nav>
@@ -219,7 +219,7 @@ ${contentToProcess.substring(0, 20000)}
               value={contentText}
               onChange={(e) => setContentText(e.target.value)}
               placeholder="For example: 'The mitochondria is the powerhouse of the cell...'"
-              className="w-full h-64 p-4 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700 resize-y animate-fade-in"
+              className="w-full h-64 p-4 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700/50 resize-y animate-fade-in"
               disabled={isLoading}
             />
         )}
@@ -227,7 +227,7 @@ ${contentToProcess.substring(0, 20000)}
         {mode === 'pdf' && (
             <div className="animate-fade-in">
               <input type="file" id="pdf-upload" className="hidden" onChange={handleFileChange} accept=".pdf" disabled={isLoading} />
-              <label htmlFor="pdf-upload" className={`w-full h-64 flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-colors ${isLoading ? 'cursor-not-allowed bg-slate-100 dark:bg-slate-700' : 'cursor-pointer border-slate-300 dark:border-slate-600 hover:border-teal-500 hover:bg-teal-50 dark:hover:bg-slate-700'}`}>
+              <label htmlFor="pdf-upload" className={`w-full h-64 flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-colors ${isLoading ? 'cursor-not-allowed bg-slate-100 dark:bg-slate-700' : 'cursor-pointer border-slate-300 dark:border-slate-600 hover:border-teal-500 hover:bg-teal-500/10 dark:hover:bg-slate-700/50'}`}>
                 <DocumentArrowUpIcon className="w-12 h-12 text-slate-400 dark:text-slate-500 mb-2"/>
                 <span className="font-semibold text-slate-600 dark:text-slate-300">
                   {selectedFile ? 'File selected:' : 'Click to upload or drag & drop'}
@@ -252,7 +252,7 @@ ${contentToProcess.substring(0, 20000)}
         <button
           onClick={handleGenerateCourse}
           disabled={isLoading}
-          className="w-full inline-flex items-center justify-center py-3 px-6 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all hover:scale-105"
+          className="w-full inline-flex items-center justify-center py-3 px-6 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-teal-500 disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-all hover:scale-105"
         >
           {isLoading ? (
             <>

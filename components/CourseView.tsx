@@ -41,7 +41,7 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="relative text-center">
-         <button onClick={onBack} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+         <button onClick={onBack} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
              <ArrowLeftIcon className="w-6 h-6"/>
          </button>
         <h2 className="text-3xl font-bold text-slate-800 dark:text-white">{course.title}</h2>
@@ -49,7 +49,7 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
       </div>
       <div className="relative pl-10">
         {/* Vertical line */}
-        <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
+        <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700/50"></div>
 
         <ul className="space-y-10">
           {course.lessons.map((lesson) => {
@@ -59,16 +59,16 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
 
             return (
               <li key={lesson.id} className="relative">
-                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-slate-50 dark:border-slate-900 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
+                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-gray-100 dark:border-gray-950 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
                       {isCompleted ? <CheckCircleIcon className="w-6 h-6 text-white" fill="none" stroke="currentColor"/> : getLessonIcon(lesson.type)}
                   </div>
-                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-700 ${isCompleted ? 'opacity-70' : ''}`}>
+                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70' : ''}`}>
                       <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
                       <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
                       <button
                           onClick={() => onStartLesson(lesson)}
                           disabled={isLocked}
-                          className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
+                          className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-teal-500 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
                       >
                           {isCompleted ? (
                              <>
