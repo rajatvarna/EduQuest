@@ -54,6 +54,9 @@ This phase focuses on building the user-facing application and connecting it to 
 
 These tasks are priorities for evolving the application after the initial foundation is built.
 
+- [ ] **AI Features:**
+    - [x] Implement a user-facing AI tutor ("QuestBot") to help with lessons.
+    - [x] Integrate Gemini streaming chat API for real-time responses.
 - [ ] **Gamification Logic:**
     - [ ] Implement backend logic for daily streak tracking (e.g., daily cron job).
     - [ ] Implement backend logic for heart replenishment over time.

@@ -12,6 +12,8 @@ import Auth from './components/Auth';
 import AdminDashboard from './components/AdminDashboard';
 import LessonCompleteModal from './components/LessonCompleteModal';
 import UserProfile from './components/UserProfile';
+import QuestBot from './components/QuestBot';
+import { ChatBubbleLeftRightIcon } from './components/icons';
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
@@ -29,6 +31,7 @@ const App: React.FC = () => {
   const [lessonCompleteData, setLessonCompleteData] = useState<{ pointsEarned: number } | null>(null);
   const [theme, setTheme] = useState<Theme>('light');
   const [isLoading, setIsLoading] = useState(true);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -285,11 +288,13 @@ const App: React.FC = () => {
           <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-4xl">
             {renderContent()}
           </main>
+          
           <SubscriptionModal 
             isOpen={isModalOpen} 
             onClose={() => setIsModalOpen(false)}
             onSubscribe={refillHearts}
           />
+          
           {lessonCompleteData && (
             <LessonCompleteModal 
               isOpen={!!lessonCompleteData}
@@ -298,6 +303,21 @@ const App: React.FC = () => {
               currentStreak={userStats.streak}
             />
           )}
+
+          <QuestBot 
+            isOpen={isChatbotOpen}
+            onClose={() => setIsChatbotOpen(false)}
+            activeLesson={activeLesson}
+          />
+
+          <button
+            onClick={() => setIsChatbotOpen(true)}
+            className="fixed bottom-6 right-6 bg-teal-500 text-white p-4 rounded-full shadow-lg hover:bg-teal-600 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-teal-500"
+            aria-label="Ask QuestBot"
+            title="Ask QuestBot"
+          >
+            <ChatBubbleLeftRightIcon className="w-8 h-8"/>
+          </button>
         </>
       ) : null}
     </div>
