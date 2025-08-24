@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GoogleIcon, FacebookIcon, GithubIcon } from './icons';
+import { GoogleIcon, FacebookIcon, GithubIcon, EduQuestLogo } from './icons';
 import { User } from '../types';
 
 interface AuthProps {
@@ -78,7 +78,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
             return (
                  <div className="animate-fade-in">
                     <div className="text-center mb-6">
-                        <h1 className="text-3xl font-bold text-teal-500 mb-2">Reset Password</h1>
+                         <EduQuestLogo className="h-10 w-auto mx-auto text-teal-500 mb-4" />
+                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Reset Password</h1>
                         <p className="text-slate-500 dark:text-slate-400">Enter your email to get a reset link.</p>
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -110,7 +111,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
         return (
             <div className="animate-fade-in">
                 <div className="text-center mb-6">
-                    <h1 className="text-3xl font-bold text-teal-500 mb-2">EduQuest</h1>
+                    <EduQuestLogo className="h-12 w-auto mx-auto text-teal-500 mb-4" />
                     <p className="text-slate-500 dark:text-slate-400">{isLoginView ? 'Welcome back! Please sign in.' : 'Create an account to start learning.'}</p>
                 </div>
                 {error && <p className="text-red-500 text-sm text-center mb-4 bg-red-100 dark:bg-red-900/30 p-2 rounded-md">{error}</p>}
