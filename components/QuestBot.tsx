@@ -111,7 +111,7 @@ const QuestBot: React.FC<QuestBotProps> = ({ isOpen, onClose, activeLesson }) =>
           {messages.map((msg, index) => (
             <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
               {msg.role === 'model' && <div className="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0"><SparklesIcon className="w-5 h-5 text-teal-500"/></div>}
-              <div className={`p-3 rounded-2xl max-w-xs md:max-w-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-teal-500 text-white rounded-br-none' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-bl-none'}`}>
+              <div className={`p-3 rounded-2xl max-w-xs md:max-w-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-gradient-to-br from-teal-500 to-cyan-500 text-white rounded-br-none shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-bl-none'}`}>
                 {msg.text}
                 {isLoading && index === messages.length -1 && msg.role === 'model' && <span className="inline-block w-2 h-4 bg-slate-600 dark:bg-slate-300 animate-pulse ml-1"></span>}
               </div>

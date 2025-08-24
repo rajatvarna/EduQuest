@@ -199,7 +199,7 @@ const App: React.FC = () => {
   
   if (isLoading) {
       return (
-          <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950">
+          <div className="min-h-screen flex items-center justify-center">
               <div className="w-16 h-16 border-4 border-teal-500 border-dashed rounded-full animate-spin"></div>
           </div>
       )
@@ -272,7 +272,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="font-sans antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
+    <div className="antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
       {!isAuthenticated ? (
         <Auth onLogin={handleLogin} onRegister={handleRegister} />
       ) : userStats ? (

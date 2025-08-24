@@ -17,34 +17,37 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
         onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all animate-jump-in"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all animate-jump-in relative overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-3xl font-bold text-teal-500 mb-4">Lesson Complete!</h2>
-        
-        <div className="space-y-4 my-6">
-            <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
-                <span className="font-semibold text-slate-600 dark:text-slate-300">Points Earned</span>
-                <div className="flex items-center font-bold text-lg text-yellow-500">
-                    <StarIcon className="w-6 h-6 mr-1" />
-                    <span>+{pointsEarned}</span>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_#2dd4bf_0%,_transparent_40%)] animate-beams opacity-20 dark:opacity-10"></div>
+        <div className="relative z-10">
+            <h2 className="text-3xl font-bold text-teal-500 mb-4">Lesson Complete!</h2>
+            
+            <div className="space-y-4 my-6">
+                <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
+                    <span className="font-semibold text-slate-600 dark:text-slate-300">Points Earned</span>
+                    <div className="flex items-center font-bold text-lg text-yellow-500">
+                        <StarIcon className="w-6 h-6 mr-1" />
+                        <span>+{pointsEarned}</span>
+                    </div>
+                </div>
+                <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
+                    <span className="font-semibold text-slate-600 dark:text-slate-300">Daily Streak</span>
+                    <div className="flex items-center font-bold text-lg text-orange-500">
+                        <FlameIcon className="w-6 h-6 mr-1" />
+                        <span>{currentStreak}</span>
+                    </div>
                 </div>
             </div>
-            <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
-                <span className="font-semibold text-slate-600 dark:text-slate-300">Daily Streak</span>
-                <div className="flex items-center font-bold text-lg text-orange-500">
-                    <FlameIcon className="w-6 h-6 mr-1" />
-                    <span>{currentStreak}</span>
-                </div>
-            </div>
-        </div>
 
-        <button
-          onClick={onClose}
-          className="w-full py-3 px-4 bg-teal-500 text-white font-bold rounded-xl hover:bg-teal-600 transition-transform hover:scale-105"
-        >
-          Continue
-        </button>
+            <button
+              onClick={onClose}
+              className="w-full py-3 px-4 bg-teal-500 text-white font-bold rounded-xl hover:bg-teal-600 transition-transform hover:scale-105"
+            >
+              Continue
+            </button>
+        </div>
       </div>
     </div>
   );

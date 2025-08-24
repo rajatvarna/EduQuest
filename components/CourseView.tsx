@@ -49,7 +49,7 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
       </div>
       <div className="relative pl-10">
         {/* Vertical line */}
-        <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700/50"></div>
+        <div className="absolute left-4 top-4 bottom-4 w-0.5 border-l-2 border-dashed border-slate-300 dark:border-slate-700"></div>
 
         <ul className="space-y-10">
           {course.lessons.map((lesson) => {
@@ -59,10 +59,10 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
 
             return (
               <li key={lesson.id} className="relative">
-                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-gray-100 dark:border-gray-950 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
+                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-slate-50 dark:border-gray-950 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
                       {isCompleted ? <CheckCircleIcon className="w-6 h-6 text-white" fill="none" stroke="currentColor"/> : getLessonIcon(lesson.type)}
                   </div>
-                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70' : ''}`}>
+                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70 grayscale-[50%]' : 'hover:-translate-y-1'}`}>
                       <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
                       <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
                       <button

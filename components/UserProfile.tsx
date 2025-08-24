@@ -62,13 +62,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
       </div>
 
       <div className="bg-white dark:bg-slate-800/50 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col sm:flex-row items-center sm:space-x-8">
-            <div className="relative mb-6 sm:mb-0">
-                <div className="w-32 h-32 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+        <div className="flex flex-col items-center">
+            <div className="relative mb-6">
+                <div className="w-36 h-36 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden ring-4 ring-white dark:ring-slate-800 shadow-lg">
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
                     ) : (
-                      <UserCircleIcon className="w-24 h-24 text-slate-400 dark:text-slate-500"/>
+                      <UserCircleIcon className="w-32 h-32 text-slate-400 dark:text-slate-500"/>
                     )}
                 </div>
                 <input
@@ -88,7 +88,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
                 </button>
             </div>
 
-            <div className="flex-grow text-center sm:text-left">
+            <div className="flex-grow text-center">
                 {isEditing ? (
                     <div className="flex items-center gap-2">
                         <input
@@ -100,7 +100,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
                         />
                     </div>
                 ) : (
-                    <div className="flex items-center gap-3 justify-center sm:justify-start">
+                    <div className="flex items-center gap-3 justify-center">
                         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">{user.name}</h1>
                         <button onClick={() => setIsEditing(true)} className="p-2 text-slate-500 hover:text-teal-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                             <PencilIcon className="w-5 h-5"/>
@@ -109,7 +109,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
                 )}
                 <p className="text-slate-500 dark:text-slate-400 mt-1">{user.email}</p>
                 {isEditing && (
-                    <div className="mt-4 flex gap-2 justify-center sm:justify-start">
+                    <div className="mt-4 flex gap-2 justify-center">
                         <button onClick={handleSave} className="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600">Save</button>
                         <button onClick={handleCancel} className="px-4 py-2 bg-slate-200 dark:bg-slate-600 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button>
                     </div>

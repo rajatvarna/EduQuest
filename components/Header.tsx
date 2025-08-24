@@ -20,17 +20,17 @@ const Header: React.FC<HeaderProps> = ({ userStats, onNavigateToAdmin, onNavigat
             EduQuest
             </h1>
         </button>
-        <div className="flex items-center space-x-2 sm:space-x-4">
-          <div className="hidden sm:flex items-center space-x-1 text-yellow-500 font-bold">
-            <StarIcon className="h-6 w-6" />
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-2 text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-500/20 px-3 py-1 rounded-full text-sm">
+            <StarIcon className="h-5 w-5" />
             <span>{userStats.points}</span>
           </div>
-          <div className="hidden sm:flex items-center space-x-1 text-orange-500 font-bold">
-            <FlameIcon className="h-6 w-6" />
+          <div className="flex items-center space-x-2 text-orange-600 dark:text-orange-400 font-bold bg-orange-100 dark:bg-orange-500/20 px-3 py-1 rounded-full text-sm">
+            <FlameIcon className="h-5 w-5" />
             <span>{userStats.streak}</span>
           </div>
-          <div className="flex items-center space-x-1 text-red-500 font-bold">
-            <HeartIcon className="h-6 w-6" />
+          <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 font-bold bg-red-100 dark:bg-red-500/20 px-3 py-1 rounded-full text-sm">
+            <HeartIcon className="h-5 w-5" />
             <span>{userStats.hearts}</span>
           </div>
           
