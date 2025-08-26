@@ -26,6 +26,7 @@ export interface Lesson {
   questions?: Question[];
   content?: string; // For READING type
   videoId?: string; // For VIDEO type (e.g., YouTube video ID)
+  inlineQuestions?: Question[]; // For interactive READING type
 }
 
 export interface Course {
