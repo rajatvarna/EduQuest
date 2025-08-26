@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HeartIcon } from './icons';
 
@@ -14,7 +13,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose, 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div 
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform transition-all animate-jump-in"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform transition-all animate-jump-in border border-slate-200 dark:border-slate-700"
         onClick={e => e.stopPropagation()}
       >
         <div className="text-red-500 mx-auto mb-4">
@@ -27,13 +26,13 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose, 
         <div className="space-y-3">
           <button 
             onClick={onSubscribe}
-            className="w-full py-3 px-4 bg-teal-500 text-white font-bold rounded-xl hover:bg-teal-600 transition-transform hover:scale-105"
+            className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-105 shadow-lg"
           >
             Get Unlimited Hearts
           </button>
           <button 
             onClick={onClose}
-            className="w-full py-3 px-4 text-teal-500 font-bold rounded-xl hover:bg-teal-100 dark:hover:bg-slate-700 transition-colors"
+            className="w-full py-3 px-4 text-teal-500 font-bold rounded-xl hover:bg-teal-100/50 dark:hover:bg-slate-700/50 transition-colors"
           >
             No Thanks
           </button>

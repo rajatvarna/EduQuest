@@ -17,7 +17,7 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
         onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all animate-jump-in relative overflow-hidden"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all animate-jump-in relative overflow-hidden border border-slate-200 dark:border-slate-700"
         onClick={e => e.stopPropagation()}
       >
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_#2dd4bf_0%,_transparent_40%)] animate-beams opacity-20 dark:opacity-10"></div>
@@ -43,7 +43,7 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
 
             <button
               onClick={onClose}
-              className="w-full py-3 px-4 bg-teal-500 text-white font-bold rounded-xl hover:bg-teal-600 transition-transform hover:scale-105"
+              className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-105 shadow-lg"
             >
               Continue
             </button>

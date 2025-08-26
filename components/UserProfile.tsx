@@ -61,10 +61,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
         <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Profile & Stats</h2>
       </div>
 
-      <div className="bg-white dark:bg-slate-800/50 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-800">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700">
         <div className="flex flex-col items-center">
             <div className="relative mb-6">
-                <div className="w-36 h-36 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden ring-4 ring-white dark:ring-slate-800 shadow-lg">
+                <div className="w-36 h-36 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden ring-4 ring-white dark:ring-slate-900 shadow-lg">
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
                     ) : (
@@ -95,7 +95,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="text-3xl font-bold bg-transparent border-b-2 border-teal-500 focus:outline-none w-full"
+                            className="text-3xl font-bold text-center bg-transparent border-b-2 border-teal-500 focus:outline-none w-full"
                             autoFocus
                         />
                     </div>
@@ -128,7 +128,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, onUpdateUser
       </div>
       
       <div className="flex justify-center">
-        <button onClick={onLogout} className="inline-flex items-center justify-center px-6 py-3 bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 font-semibold rounded-lg shadow-sm hover:bg-slate-300 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-slate-500 transition-colors">
+        <button onClick={onLogout} className="inline-flex items-center justify-center px-6 py-3 bg-slate-200/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 font-semibold rounded-lg shadow-sm hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-slate-500 transition-colors">
             <ArrowLeftOnRectangleIcon className="w-5 h-5 mr-2" />
             Logout
         </button>

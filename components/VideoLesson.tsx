@@ -27,7 +27,7 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
         <h1 className="text-2xl md:text-3xl font-bold">{lesson.title}</h1>
       </div>
       
-      <div className="flex-grow flex items-center justify-center bg-black rounded-xl overflow-hidden mb-24 shadow-2xl">
+      <div className="flex-grow flex items-center justify-center bg-black rounded-xl overflow-hidden mb-24 shadow-2xl ring-1 ring-slate-500/10">
         <iframe
           className="w-full h-full aspect-video"
           src={`https://www.youtube.com/embed/${lesson.videoId}`}
@@ -38,11 +38,11 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
         ></iframe>
       </div>
       
-      <div className="fixed bottom-0 left-0 right-0 p-4 border-t-2 border-slate-200 dark:border-slate-800 bg-gray-100/80 dark:bg-gray-950/80 backdrop-blur-sm">
-        <div className="container mx-auto max-w-4xl">
+      <div className="fixed bottom-0 left-0 right-0 p-4 border-t-2 border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+        <div className="container mx-auto max-w-5xl">
             <button
               onClick={() => onComplete(lesson.id)}
-              className="w-full py-4 text-xl font-bold text-white bg-teal-500 rounded-xl hover:bg-teal-600 transition-colors"
+              className="w-full py-4 text-xl font-bold text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 rounded-xl transition-all shadow-lg hover:shadow-xl"
             >
               Complete Lesson
             </button>

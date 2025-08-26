@@ -285,7 +285,7 @@ const App: React.FC = () => {
             theme={theme}
             toggleTheme={toggleTheme}
           />
-          <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-4xl">
+          <main className="flex-grow container mx-auto p-4 md:p-8 w-full max-w-5xl">
             {renderContent()}
           </main>
           
@@ -312,7 +312,7 @@ const App: React.FC = () => {
 
           <button
             onClick={() => setIsChatbotOpen(true)}
-            className="fixed bottom-6 right-6 bg-teal-500 text-white p-4 rounded-full shadow-lg hover:bg-teal-600 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-teal-500"
+            className="fixed bottom-6 right-6 bg-gradient-to-r from-teal-500 to-cyan-600 text-white p-4 rounded-full shadow-lg hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-cyan-500"
             aria-label="Ask QuestBot"
             title="Ask QuestBot"
           >

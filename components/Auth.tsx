@@ -86,11 +86,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
                             <div className="mt-1">
-                                <input type="email" name="email" id="email" autoComplete="email" required className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700" placeholder="you@example.com"/>
+                                <input type="email" name="email" id="email" autoComplete="email" required className="w-full px-3 py-2 border border-slate-300/50 dark:border-slate-600/50 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-200/50 dark:bg-slate-800/50 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white/70 dark:focus:bg-slate-800" placeholder="you@example.com"/>
                             </div>
                         </div>
                         <div>
-                            <button type="submit" disabled={isLoading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-transform hover:scale-105 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                            <button type="submit" disabled={isLoading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-transform hover:scale-105 disabled:bg-slate-400 disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed">
                                 {isLoading ? 'Sending...' : 'Send Reset Link'}
                             </button>
                         </div>
@@ -121,21 +121,21 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
                          <div>
                             <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
                             <div className="mt-1">
-                                <input type="text" name="name" id="name" required className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700" placeholder="Your Name"/>
+                                <input type="text" name="name" id="name" required className="w-full px-3 py-2 border border-slate-300/50 dark:border-slate-600/50 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-200/50 dark:bg-slate-800/50 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white/70 dark:focus:bg-slate-800" placeholder="Your Name"/>
                             </div>
                         </div>
                     )}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
                         <div className="mt-1">
-                            <input type="email" name="email" id="email" autoComplete="email" required className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700" placeholder="you@example.com"/>
+                            <input type="email" name="email" id="email" autoComplete="email" required className="w-full px-3 py-2 border border-slate-300/50 dark:border-slate-600/50 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-200/50 dark:bg-slate-800/50 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white/70 dark:focus:bg-slate-800" placeholder="you@example.com"/>
                         </div>
                     </div>
 
                     <div>
                         <label htmlFor="password"className="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
                         <div className="mt-1">
-                            <input type="password" name="password" id="password" autoComplete="current-password" required className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-50 dark:bg-slate-700" placeholder="••••••••"/>
+                            <input type="password" name="password" id="password" autoComplete="current-password" required className="w-full px-3 py-2 border border-slate-300/50 dark:border-slate-600/50 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-slate-200/50 dark:bg-slate-800/50 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white/70 dark:focus:bg-slate-800" placeholder="••••••••"/>
                         </div>
                     </div>
                     
@@ -148,7 +148,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
                     )}
                     
                     <div className="pt-2">
-                        <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-transform hover:scale-105 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-transform hover:scale-105 disabled:bg-slate-400 disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed">
                              {isLoading && <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>}
                             {isLoading ? 'Processing...' : (isLoginView ? 'Sign In' : 'Create Account')}
                         </button>
@@ -158,30 +158,30 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
                 <div className="mt-6">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
+                            <div className="w-full border-t border-slate-300/50 dark:border-slate-600/50"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">Or continue with</span>
+                            <span className="px-2 bg-white/20 dark:bg-slate-900/30 text-slate-500 dark:text-slate-400 backdrop-blur-sm">Or continue with</span>
                         </div>
                     </div>
 
                     <div className="mt-6 grid grid-cols-3 gap-3">
                         <div>
-                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm bg-white dark:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
+                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300/50 dark:border-slate-600/50 rounded-md shadow-sm bg-white/50 dark:bg-slate-700/50 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
                                 <span className="sr-only">Sign in with Google</span>
                                 <GoogleIcon className="w-5 h-5"/>
                             </button>
                         </div>
 
                         <div>
-                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm bg-white dark:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
+                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300/50 dark:border-slate-600/50 rounded-md shadow-sm bg-white/50 dark:bg-slate-700/50 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
                                 <span className="sr-only">Sign in with Facebook</span>
                                 <FacebookIcon className="w-5 h-5" />
                             </button>
                         </div>
 
                         <div>
-                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm bg-white dark:bg-slate-700 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
+                            <button onClick={handleSocialLogin} disabled={isLoading} className="w-full inline-flex justify-center py-2 px-4 border border-slate-300/50 dark:border-slate-600/50 rounded-md shadow-sm bg-white/50 dark:bg-slate-700/50 text-sm font-medium text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600">
                                 <span className="sr-only">Sign in with GitHub</span>
                                 <GithubIcon className="w-5 h-5"/>
                             </button>
@@ -204,7 +204,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
     return (
         <div className="flex-grow flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl p-8 min-h-[620px] flex flex-col justify-center border border-slate-200/50 dark:border-slate-700/50">
+                <div className="bg-white/20 dark:bg-slate-900/30 backdrop-blur-xl shadow-2xl rounded-2xl p-8 min-h-[620px] flex flex-col justify-center border border-slate-300/30 dark:border-slate-700/30">
                     {renderContent()}
                 </div>
             </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Lesson, Question } from '../types';
 import { CheckIcon, XMarkIcon, ArrowLeftIcon } from './icons';
@@ -55,8 +54,8 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
   const getButtonClass = (index: number) => {
     if (!isAnswerChecked) {
       return selectedAnswer === index
-        ? 'bg-teal-50 dark:bg-teal-900/50 border-teal-500'
-        : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-slate-300 dark:border-slate-600';
+        ? 'bg-teal-100 dark:bg-teal-900/50 border-teal-500 ring-2 ring-teal-500/30'
+        : 'bg-white dark:bg-slate-800 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 border-slate-300 dark:border-slate-600';
     }
 
     if (index === currentQuestion.correctAnswerIndex) {
@@ -100,36 +99,33 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
         </div>
       </div>
       
-      {isAnswerChecked && (
-         <div className={`fixed bottom-0 left-0 right-0 p-4 border-t-2 ${isCorrect ? 'border-green-300 dark:border-green-800 bg-green-100/95 dark:bg-green-900/95' : 'border-red-300 dark:border-red-800 bg-red-100/95 dark:bg-red-900/95'} backdrop-blur-sm animate-slide-in-up`}>
-            <div className="container mx-auto max-w-4xl flex items-center justify-between">
-              <div className="flex items-center">
-                {isCorrect ? <CheckIcon className="w-8 h-8 mr-2 text-green-600 dark:text-green-400"/> : <XMarkIcon className="w-8 h-8 mr-2 text-red-600 dark:text-red-400"/>}
-                <span className={`text-xl font-bold ${isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>{isCorrect ? "Correct!" : "Incorrect!"}</span>
-              </div>
-              <button
-                onClick={handleNext}
-                disabled={noHeartsLeft}
-                className={`px-8 py-3 rounded-lg font-bold text-base transition-transform hover:scale-105 shadow-md ${isCorrect ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700'} disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-600`}
-              >
-                {lesson.questions && currentIndex < lesson.questions.length - 1 ? 'Next' : 'Finish'}
-              </button>
-            </div>
-          </div>
-      )}
-
-      {!isAnswerChecked && (
-          <div className="p-4 border-t-2 border-slate-200 dark:border-slate-800">
-             <button
-                onClick={handleCheckAnswer}
-                disabled={selectedAnswer === null}
-                className="w-full py-4 text-xl font-bold text-white bg-teal-500 rounded-xl hover:bg-teal-600 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
-              >
-                Check
-              </button>
-          </div>
-      )}
-
+      <div className={`fixed bottom-0 left-0 right-0 p-4 border-t-2 ${isAnswerChecked ? (isCorrect ? 'border-green-300 dark:border-green-800' : 'border-red-300 dark:border-red-800') : 'border-slate-200 dark:border-slate-800'} bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm`}>
+        <div className="container mx-auto max-w-5xl">
+            {isAnswerChecked ? (
+                <div className="flex items-center justify-between animate-fade-in">
+                    <div className="flex items-center">
+                        {isCorrect ? <CheckIcon className="w-8 h-8 mr-2 text-green-600 dark:text-green-400"/> : <XMarkIcon className="w-8 h-8 mr-2 text-red-600 dark:text-red-400"/>}
+                        <span className={`text-xl font-bold ${isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>{isCorrect ? "Correct!" : "Incorrect!"}</span>
+                    </div>
+                    <button
+                        onClick={handleNext}
+                        disabled={noHeartsLeft}
+                        className={`px-8 py-3 rounded-lg font-bold text-base transition-transform hover:scale-105 shadow-md ${isCorrect ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700'} disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-600`}
+                    >
+                        {lesson.questions && currentIndex < lesson.questions.length - 1 ? 'Next' : 'Finish'}
+                    </button>
+                </div>
+            ) : (
+                 <button
+                    onClick={handleCheckAnswer}
+                    disabled={selectedAnswer === null}
+                    className="w-full py-4 text-xl font-bold text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 rounded-xl disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                  >
+                    Check
+                  </button>
+            )}
+        </div>
+      </div>
     </div>
   );
 };
