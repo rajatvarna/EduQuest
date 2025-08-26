@@ -19,6 +19,11 @@ export interface Question {
   correctAnswerIndex: number;
 }
 
+export interface TranscriptItem {
+  text: string;
+  start: number; // in seconds
+}
+
 export interface Lesson {
   id:string;
   title: string;
@@ -27,6 +32,7 @@ export interface Lesson {
   content?: string; // For READING type
   videoId?: string; // For VIDEO type (e.g., YouTube video ID)
   inlineQuestions?: Question[]; // For interactive READING type
+  transcript?: TranscriptItem[];
 }
 
 export interface Course {

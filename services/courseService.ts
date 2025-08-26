@@ -67,7 +67,21 @@ export const initialCourses: Course[] = [
         id: 'lesson-new-2',
         title: 'Video: Basic Conversation',
         type: 'VIDEO',
-        videoId: '_1sQ2a2c2VE' // A public domain video ID for Spanish conversation
+        videoId: '_1sQ2a2c2VE', // A public domain video ID for Spanish conversation
+        transcript: [
+          { start: 0.8, text: "Hola, buenos días." },
+          { start: 3.0, text: "Buenos días. ¿Cómo estás?" },
+          { start: 5.2, text: "Muy bien, gracias. ¿Y usted?" },
+          { start: 7.5, text: "Bien, gracias." },
+          { start: 9.0, text: "¿Cómo se llama usted?" },
+          { start: 11.2, text: "Me llamo David. ¿Y usted?" },
+          { start: 13.5, text: "Me llamo Mónica." },
+          { start: 15.0, text: "Mucho gusto, Mónica." },
+          { start: 16.8, text: "Igualmente, David." },
+          { start: 18.5, text: "¿De dónde es usted?" },
+          { start: 20.2, text: "Soy de los Estados Unidos." },
+          { start: 22.5, text: "Ah, ¡qué bien!" }
+        ]
       }
     ],
   },

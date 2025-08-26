@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import YouTube from 'react-youtube';
-import type { YouTubePlayer } from 'react-youtube';
+// FIX: Import YouTubeProps for explicit typing of player options.
+import type { YouTubePlayer, YouTubeProps } from 'react-youtube';
 import { Lesson } from '../types';
 import { ArrowLeftIcon, PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from './icons';
 
@@ -18,9 +19,11 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [activeTranscriptIndex, setActiveTranscriptIndex] = useState(-1);
 
   const progressIntervalRef = useRef<number | null>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
+  const transcriptContainerRef = useRef<HTMLDivElement>(null);
   
   const clearProgressInterval = () => {
     if (progressIntervalRef.current) {
@@ -31,15 +34,42 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
 
   useEffect(() => {
     if (isPlaying && player) {
+      // FIX: Use an async callback to await the player's current time.
       progressIntervalRef.current = window.setInterval(async () => {
         const currentTime = await player.getCurrentTime();
         setProgress(currentTime);
+
+        if (lesson.transcript) {
+            let newIndex = -1;
+            for (let i = 0; i < lesson.transcript.length; i++) {
+                if (currentTime >= lesson.transcript[i].start) {
+                    newIndex = i;
+                } else {
+                    break;
+                }
+            }
+            setActiveTranscriptIndex(newIndex);
+        }
       }, 250);
     } else {
       clearProgressInterval();
     }
     return () => clearProgressInterval();
-  }, [isPlaying, player]);
+  }, [isPlaying, player, lesson.transcript]);
+  
+  useEffect(() => {
+    if (activeTranscriptIndex > -1 && transcriptContainerRef.current) {
+      const activeElement = transcriptContainerRef.current.children[activeTranscriptIndex] as HTMLElement;
+      if (activeElement) {
+        // Check if element is in view before scrolling
+        const containerRect = transcriptContainerRef.current.getBoundingClientRect();
+        const elementRect = activeElement.getBoundingClientRect();
+        if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
+             activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+  }, [activeTranscriptIndex]);
 
   const onReady = (event: { target: YouTubePlayer }) => {
     setPlayer(event.target);
@@ -48,22 +78,12 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   };
   
   const onStateChange = (event: { data: number }) => {
-    // -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
-    if (event.data === 1) { // Playing
-        setIsPlaying(true);
-    } else { // Paused, ended, etc.
-        setIsPlaying(false);
-    }
+    setIsPlaying(event.data === 1);
   };
 
   const handlePlayPause = () => {
     if (!player) return;
-    if (isPlaying) {
-      player.pauseVideo();
-    } else {
-      player.playVideo();
-    }
-    setIsPlaying(!isPlaying);
+    isPlaying ? player.pauseVideo() : player.playVideo();
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -71,8 +91,7 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
     const bar = e.currentTarget;
     const rect = bar.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const percentage = x / rect.width;
-    const newTime = duration * percentage;
+    const newTime = duration * (x / rect.width);
     player.seekTo(newTime, true);
     setProgress(newTime);
   };
@@ -90,13 +109,8 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
 
   const toggleMute = () => {
       if (!player) return;
-      if(isMuted) {
-          player.unMute();
-          setIsMuted(false);
-      } else {
-          player.mute();
-          setIsMuted(true);
-      }
+      isMuted ? player.unMute() : player.mute();
+      setIsMuted(!isMuted);
   };
   
   const formatTime = (seconds: number) => {
@@ -112,9 +126,7 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   };
   
   const hideControls = () => {
-      if (controlsTimeoutRef.current) {
-          clearTimeout(controlsTimeoutRef.current);
-      }
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
       if (isPlaying) {
          controlsTimeoutRef.current = window.setTimeout(() => setShowControls(false), 2000);
       }
@@ -123,6 +135,13 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   const handleMouseMove = () => {
       setShowControls(true);
       hideControls();
+  };
+
+  const handleTranscriptClick = (time: number) => {
+    if (player) {
+      player.seekTo(time, true);
+      if (!isPlaying) player.playVideo();
+    }
   };
 
   if (!lesson.videoId) {
@@ -139,7 +158,8 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
     );
   }
 
-  const opts = {
+  // FIX: Explicitly type `opts` to match `react-youtube`'s expected props.
+  const opts: YouTubeProps['opts'] = {
     height: '100%',
     width: '100%',
     playerVars: {
@@ -158,25 +178,27 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
         <button onClick={onExit} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 mr-4">
           <ArrowLeftIcon className="w-6 h-6" />
         </button>
-        <h1 className="text-2xl md:text-3xl font-bold">{lesson.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold truncate">{lesson.title}</h1>
       </div>
       
-      <div 
-        className="flex-grow bg-black rounded-xl overflow-hidden mb-24 shadow-2xl ring-1 ring-slate-500/10 relative"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={hideControls}
-      >
-        <YouTube
-          videoId={lesson.videoId}
-          opts={opts}
-          onReady={onReady}
-          onStateChange={onStateChange}
-          className="w-full h-full absolute"
-        />
-        
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'} pointer-events-none`}></div>
-        
-        <div className={`absolute bottom-0 left-0 right-0 p-4 text-white transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'} pointer-events-auto`}>
+       <div className="flex-grow flex flex-col lg:flex-row gap-6 mb-24 overflow-hidden">
+        {/* Video Player Section */}
+        <div 
+          className="flex-grow bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-slate-500/10 relative lg:w-2/3"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={hideControls}
+        >
+          <YouTube
+            videoId={lesson.videoId}
+            opts={opts}
+            onReady={onReady}
+            onStateChange={onStateChange}
+            className="w-full h-full absolute"
+          />
+          
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'} pointer-events-none`}></div>
+          
+          <div className={`absolute bottom-0 left-0 right-0 p-4 text-white transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'} pointer-events-auto`}>
             {/* Progress Bar */}
             <div className="group/progress w-full h-4 -translate-y-2 flex items-center cursor-pointer" onClick={handleSeek}>
               <div className="w-full h-1 group-hover/progress:h-1.5 bg-white/30 rounded-full transition-all">
@@ -211,7 +233,31 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
                     {formatTime(progress)} / {formatTime(duration)}
                 </div>
             </div>
+          </div>
         </div>
+
+        {/* Transcript Section */}
+        {lesson.transcript && (
+            <div className="lg:w-1/3 flex flex-col bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner h-full">
+                <h3 className="text-lg font-bold p-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">Transcript</h3>
+                <div ref={transcriptContainerRef} className="flex-grow overflow-y-auto p-2 space-y-1">
+                    {lesson.transcript.map((item, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleTranscriptClick(item.start)}
+                            className={`w-full text-left p-3 rounded-lg transition-colors ${
+                                index === activeTranscriptIndex
+                                ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-100'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50'
+                            }`}
+                        >
+                            <span className="font-mono text-xs text-slate-500 dark:text-slate-400 block mb-1">{formatTime(item.start)}</span>
+                            <p className="leading-snug">{item.text}</p>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        )}
       </div>
       
       <div className="fixed bottom-0 left-0 right-0 p-4 border-t-2 border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
