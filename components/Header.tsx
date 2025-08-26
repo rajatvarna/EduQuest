@@ -15,8 +15,9 @@ const Header: React.FC<HeaderProps> = ({ userStats, onNavigateToAdmin, onNavigat
   return (
     <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center max-w-4xl">
-        <button onClick={onNavigateHome} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md" aria-label="Go to homepage">
+        <button onClick={onNavigateHome} className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-md" aria-label="Go to homepage">
             <EduQuestLogo className="h-8 w-auto text-teal-500"/>
+            <span className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">EduQuest</span>
         </button>
         <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="flex items-center space-x-2 text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-500/20 px-3 py-1 rounded-full text-sm">

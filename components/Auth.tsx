@@ -78,9 +78,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
             return (
                  <div className="animate-fade-in">
                     <div className="text-center mb-6">
-                         <EduQuestLogo className="h-10 w-auto mx-auto text-teal-500 mb-4" />
-                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Reset Password</h1>
-                        <p className="text-slate-500 dark:text-slate-400">Enter your email to get a reset link.</p>
+                         <EduQuestLogo className="h-10 w-auto mx-auto text-teal-500 mb-2" />
+                         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Reset Password</h1>
+                        <p className="text-slate-500 dark:text-slate-400 mt-2">Enter your email to get a reset link.</p>
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
@@ -111,8 +111,9 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
         return (
             <div className="animate-fade-in">
                 <div className="text-center mb-6">
-                    <EduQuestLogo className="h-12 w-auto mx-auto text-teal-500 mb-4" />
-                    <p className="text-slate-500 dark:text-slate-400">{isLoginView ? 'Welcome back! Please sign in.' : 'Create an account to start learning.'}</p>
+                    <EduQuestLogo className="h-12 w-auto mx-auto text-teal-500" />
+                    <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">EduQuest</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">{isLoginView ? 'Welcome back! Please sign in.' : 'Create an account to start learning.'}</p>
                 </div>
                 {error && <p className="text-red-500 text-sm text-center mb-4 bg-red-100 dark:bg-red-900/30 p-2 rounded-md">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">

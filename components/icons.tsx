@@ -4,12 +4,16 @@ type IconProps = React.SVGProps<SVGSVGElement>;
 
 export const EduQuestLogo: React.FC<IconProps> = (props) => (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <path 
-            d="M12 20V4M12 12L8 8M12 12L16 8M8 8L6 6M8 8L10 6M16 8L14 6M16 8L18 6" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
+        <path
+            d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
             strokeLinejoin="round"
+        />
+        <path
+            d="M14.5 12.75L12 6L9.5 12.75L8 13.5L10.25 15L10.875 17.5L12 16L13.125 17.5L13.75 15L16 13.5L14.5 12.75Z"
+            fill="currentColor"
         />
     </svg>
 );
