@@ -54,24 +54,56 @@ This phase focuses on building the user-facing application and connecting it to 
 
 These tasks are priorities for evolving the application after the initial foundation is built.
 
-- [ ] **AI Features:**
-    - [x] Implement a user-facing AI tutor ("QuestBot") to help with lessons.
-    - [x] Integrate Gemini streaming chat API for real-time responses.
-- [ ] **Gamification Logic:**
+### Core Learning Experience
+- [ ] **Interactive Reading Lessons:**
+    - [ ] Implement inline, non-graded comprehension checks.
+    - [ ] Add highlighting and note-taking functionality for users.
+- [ ] **Smarter Quizzes:**
+    - [ ] Implement a Spaced Repetition System (SRS) for reviewing difficult questions.
+    - [ ] Enhance AI generator to create diverse question types (fill-in-the-blank, matching, etc.).
+- [ ] **Engaging Video Lessons:**
+    - [ ] Add an interactive, clickable transcript that syncs with video playback.
+    - [ ] Implement in-video pop-up questions to check for active viewing.
+
+### Gamification & Motivation
+- [ ] **Achievements System:**
+    - [ ] Design and implement a system for earning badges for milestones (course completion, streaks).
+- [ ] **Leaderboards:**
+    - [ ] Add weekly leaderboards with "Global" and "Friends" filters.
+- [ ] **Daily Quests:**
+    - [ ] Implement a system for daily quests (e.g., "Complete 1 lesson") for bonus rewards.
+- [ ] **Backend Logic:**
     - [ ] Implement backend logic for daily streak tracking (e.g., daily cron job).
     - [ ] Implement backend logic for heart replenishment over time.
-    - [x] **Add more dynamic UI feedback for earning points and streak increases.**
-- [ ] **User Profile:**
-    - [x] Create a dedicated User Profile page.
-    - [x] Allow users to view stats, change their display name, and update their avatar (client-side implementation complete).
+- [x] **Add more dynamic UI feedback for earning points and streak increases.**
+
+### AI Capabilities
+- [x] **Implement a user-facing AI tutor ("QuestBot").**
+- [x] **Integrate Gemini streaming chat API for real-time responses.**
+- [ ] **Proactive Tutoring:**
+    - [ ] Make QuestBot proactively offer help when a user struggles with a quiz.
+- [ ] **Personalized Learning:**
+    - [ ] Use AI to analyze user performance and generate personalized review lessons.
+- [ ] **AI Content Generation:**
+    - [ ] Enhance Admin Dashboard to auto-summarize text for `READING` lessons.
+    - [ ] Enhance Admin Dashboard to suggest lesson topics from source material.
+
+### User Profile & Progression
+- [x] **Create a dedicated User Profile page.**
+- [x] **Allow users to view stats, change display name, and update avatar.**
+- [ ] **Visual Activity Tracking:**
+    - [ ] Add a GitHub-style activity heatmap to the profile page.
+- [ ] **Performance Analytics:**
+    - [ ] Display charts on the profile showing performance breakdowns (e.g., accuracy by course).
+- [x] **Visually indicate completed lessons on the `CourseView`.**
+
+### Backend & Infrastructure
 - [ ] **Content Management:**
-    - [ ] Implement a backend system for creating and managing courses, lessons, and questions.
-    - [x] **Expand lesson types to include 'READING' and 'VIDEO' content.**
+    - [ ] Implement a full backend system for CRUD operations on courses, lessons, and questions.
 - [ ] **User Progress:**
-    - [ ] Implement the `user_progress` data model from the PDF (using JSONB) to track progress.
-    - [x] **Visually indicate completed lessons on the `CourseView`.**
+    - [ ] Implement the `user_progress` data model from the PDF (using JSONB) to track granular progress.
 - [ ] **Payment Integration:**
-    - [ ] Integrate with a payment provider like Stripe (for web) or RevenueCat (for mobile) to handle subscriptions.
+    - [ ] Integrate with a payment provider like Stripe to handle subscriptions.
 - [ ] **Deployment:**
     - [ ] Set up a production-ready environment on AWS.
     - [ ] Deploy the complete MVP.
