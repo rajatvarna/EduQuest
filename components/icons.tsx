@@ -11,8 +11,8 @@ export const EduQuestLogo: React.FC<IconProps> = (props) => (
             strokeLinecap="round"
             strokeLinejoin="round"
         />
-        <path
-            d="M14.5 12.75L12 6L9.5 12.75L8 13.5L10.25 15L10.875 17.5L12 16L13.125 17.5L13.75 15L16 13.5L14.5 12.75Z"
+        <path 
+            d="M12 15.34l-3.53 1.85 0.67-3.93-2.85-2.78 3.94-0.57L12 6.5l1.76 3.41 3.94 0.57-2.85 2.78 0.67 3.93L12 15.34z"
             fill="currentColor"
         />
     </svg>

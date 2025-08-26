@@ -11,8 +11,8 @@ const CourseSelection: React.FC<CourseSelectionProps> = ({ courses, onSelectCour
   return (
     <div className="animate-fade-in">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Choose Your Learning Path</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2">Select a course to begin your adventure.</p>
+        <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Welcome to EduQuest</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-2">Choose a course to start your learning adventure.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {courses.map(course => (
