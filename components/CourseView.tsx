@@ -59,10 +59,16 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
 
             return (
               <li key={lesson.id} className="relative">
-                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-slate-50 dark:border-gray-950 ${isCompleted ? 'bg-green-500' : 'bg-teal-500'}`}>
-                      {isCompleted ? <CheckCircleIcon className="w-6 h-6 text-white" fill="none" stroke="currentColor"/> : getLessonIcon(lesson.type)}
+                  <div className={`absolute -left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-slate-50 dark:border-gray-950 ${isCompleted ? 'bg-green-500' : isLocked ? 'bg-slate-400 dark:bg-slate-600' : 'bg-teal-500'}`}>
+                      {isCompleted ? (
+                          <CheckCircleIcon className="w-6 h-6 text-white" fill="none" stroke="currentColor"/>
+                      ) : isLocked ? (
+                          <LockClosedIcon className="w-6 h-6 text-white" />
+                      ) : (
+                          getLessonIcon(lesson.type)
+                      )}
                   </div>
-                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70 grayscale-[50%]' : 'hover:-translate-y-1'}`}>
+                  <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70 grayscale-[50%]' : isLocked ? 'opacity-60' : 'hover:-translate-y-1 hover:shadow-lg'}`}>
                       <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
                       <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
                       <button

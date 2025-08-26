@@ -55,7 +55,7 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
   const getButtonClass = (index: number) => {
     if (!isAnswerChecked) {
       return selectedAnswer === index
-        ? 'bg-teal-100 dark:bg-teal-900 border-teal-600 ring-2 ring-teal-500'
+        ? 'bg-teal-50 dark:bg-teal-900/50 border-teal-500'
         : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-slate-300 dark:border-slate-600';
     }
 
