@@ -24,20 +24,6 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
         return null;
     }
   };
-
-  const getLessonTypeIcon = (lessonType: Lesson['type']) => {
-    const iconClasses = "w-7 h-7 text-slate-400 dark:text-slate-500 flex-shrink-0";
-    switch (lessonType) {
-      case 'QUIZ':
-        return <QuestionMarkCircleIcon className={iconClasses} />;
-      case 'READING':
-        return <DocumentTextIcon className={iconClasses} />;
-      case 'VIDEO':
-        return <VideoCameraIcon className={iconClasses} />;
-      default:
-        return null;
-    }
-  };
   
   const getLessonDescription = (lessonType: Lesson['type']) => {
       switch (lessonType) {
@@ -83,17 +69,12 @@ const CourseView: React.FC<CourseViewProps> = ({ course, onStartLesson, userHear
                       )}
                   </div>
                   <div className={`ml-8 p-6 bg-white dark:bg-slate-800/50 rounded-xl shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 ${isCompleted ? 'opacity-70 grayscale-[50%]' : isLocked ? 'opacity-60' : 'hover:-translate-y-1 hover:shadow-lg'}`}>
-                      <div className="flex items-start gap-4">
-                        {getLessonTypeIcon(lesson.type)}
-                        <div>
-                           <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
-                           <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
-                        </div>
-                      </div>
+                      <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
+                      <p className="text-slate-500 dark:text-slate-400 mt-1">{getLessonDescription(lesson.type)}</p>
                       <button
                           onClick={() => onStartLesson(lesson)}
                           disabled={isLocked}
-                          className="mt-4 ml-11 inline-flex items-center justify-center px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-teal-500 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
+                          className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-teal-500 disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors"
                       >
                           {isCompleted ? (
                              <>
