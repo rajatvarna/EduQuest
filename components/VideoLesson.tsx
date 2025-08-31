@@ -112,8 +112,8 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   useEffect(() => {
     if (isPlaying && player) {
       progressIntervalRef.current = window.setInterval(() => {
-        // FIX: The `player.getCurrentTime()` method returns a Promise, which cannot be directly passed to the `setProgress` state setter.
-        // We resolve the promise using `.then()` to get the current time as a number before updating the state and performing other checks.
+        // FIX: The `player.getCurrentTime()` method returns a Promise.
+        // We must resolve the promise to get the current time as a number before updating state.
         player.getCurrentTime().then(currentTime => {
             setProgress(currentTime);
 
@@ -162,8 +162,9 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
 
   const onReady = (event: { target: YouTubePlayer }) => {
     setPlayer(event.target);
-    const videoDuration = event.target.getDuration();
-    setDuration(videoDuration);
+    event.target.getDuration().then(videoDuration => {
+      setDuration(videoDuration);
+    });
   };
   
   const onStateChange = (event: { data: number }) => {

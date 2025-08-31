@@ -7,7 +7,7 @@ interface UserProfileProps {
   user: User;
   userStats: UserStats;
   levelInfo: LevelInfo;
-  onUpdateUser: (updatedUser: User) => void;
+  onUpdateUser: (updatedUser: User) => Promise<void>;
   onLogout: () => void;
   onNavigateHome: () => void;
 }
@@ -15,6 +15,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, onUpdateUser, onLogout, onNavigateHome }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
@@ -40,8 +41,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
   const [activityData] = useState(generateMockActivityData());
 
 
-  const handleSave = () => {
-    onUpdateUser({ ...user, name });
+  const handleSave = async () => {
+    if (isSaving || name.trim() === '' || name.trim() === user.name) return;
+    setIsSaving(true);
+    await onUpdateUser({ ...user, name: name.trim() });
+    setIsSaving(false);
     setIsEditing(false);
   };
   
@@ -113,32 +117,41 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
                 Level {levelInfo.level}
             </div>
 
-            <div className="flex-grow text-center">
-                {isEditing ? (
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="text-3xl font-bold text-center bg-transparent border-b-2 border-teal-500 focus:outline-none w-full"
-                            autoFocus
-                        />
+            <div className="flex-grow text-center w-full max-w-sm">
+                 {isEditing ? (
+                    <div className="animate-fade-in w-full space-y-4">
+                        <div>
+                            <label htmlFor="displayName" className="sr-only">Display Name</label>
+                            <input
+                                id="displayName"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="text-3xl font-bold text-center bg-slate-100 dark:bg-slate-700/50 rounded-lg px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                autoFocus
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel(); }}
+                            />
+                        </div>
+                        <div className="flex gap-2 justify-center">
+                            <button 
+                                onClick={handleSave} 
+                                disabled={isSaving || name.trim() === '' || name.trim() === user.name} 
+                                className="px-4 py-2 w-24 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 disabled:bg-slate-400 dark:disabled:bg-slate-500 disabled:cursor-not-allowed flex justify-center items-center transition-colors"
+                            >
+                                {isSaving ? <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> : 'Save'}
+                            </button>
+                            <button onClick={handleCancel} disabled={isSaving} className="px-4 py-2 bg-slate-200 dark:bg-slate-600 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 disabled:opacity-60 transition-colors">Cancel</button>
+                        </div>
                     </div>
                 ) : (
                     <div className="flex items-center gap-3 justify-center">
-                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white">{user.name}</h1>
-                        <button onClick={() => setIsEditing(true)} className="p-2 text-slate-500 hover:text-teal-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        <h1 className="text-3xl font-bold text-slate-800 dark:text-white truncate">{user.name}</h1>
+                        <button onClick={() => setIsEditing(true)} className="p-2 text-slate-500 hover:text-teal-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" title="Edit name">
                             <PencilIcon className="w-5 h-5"/>
                         </button>
                     </div>
                 )}
                 <p className="text-slate-500 dark:text-slate-400 mt-1">{user.email}</p>
-                {isEditing && (
-                    <div className="mt-4 flex gap-2 justify-center">
-                        <button onClick={handleSave} className="px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600">Save</button>
-                        <button onClick={handleCancel} className="px-4 py-2 bg-slate-200 dark:bg-slate-600 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button>
-                    </div>
-                )}
             </div>
              <div className="w-full max-w-sm mt-6 text-center">
                 <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
