@@ -12,21 +12,44 @@ export const initialCourses: Course[] = [
         questions: [
           {
             id: 'q1',
+            type: 'MULTIPLE_CHOICE',
             text: 'Which of these means "Hello"?',
             options: ['Adiós', 'Hola', 'Gracias', 'Por favor'],
             correctAnswerIndex: 1,
           },
           {
             id: 'q2',
+            type: 'MULTIPLE_CHOICE',
             text: 'How do you say "Thank you"?',
             options: ['De nada', 'Sí', 'Lo siento', 'Gracias'],
             correctAnswerIndex: 3,
           },
           {
-            id: 'q3',
-            text: 'What is "Water"?',
-            options: ['Agua', 'Leche', 'Pan', 'Vino'],
-            correctAnswerIndex: 0,
+            id: 'q-fib-1',
+            type: 'FILL_IN_THE_BLANK',
+            text: 'You say "good morning" with "buenos ___".',
+            correctAnswer: 'días',
+          },
+          {
+            id: 'q-seq-1',
+            type: 'SEQUENCING',
+            text: 'Put the numbers in order from one to three.',
+            items: ['uno', 'dos', 'tres'],
+          },
+          {
+            id: 'q-match-1',
+            type: 'MATCHING',
+            text: 'Match the English words to their Spanish translations.',
+            prompts: [
+              { id: 'm1', content: 'Water' },
+              { id: 'm2', content: 'Milk' },
+              { id: 'm3', content: 'Bread' },
+            ],
+            answers: [
+              { id: 'm1', content: 'Agua' },
+              { id: 'm2', content: 'Leche' },
+              { id: 'm3', content: 'Pan' },
+            ],
           },
         ],
       },
@@ -43,12 +66,14 @@ export const initialCourses: Course[] = [
         questions: [
           {
             id: 'q4',
+            type: 'MULTIPLE_CHOICE',
             text: 'What is "Three" in Spanish?',
             options: ['Uno', 'Dos', 'Tres', 'Cuatro'],
             correctAnswerIndex: 2,
           },
           {
             id: 'q5',
+            type: 'MULTIPLE_CHOICE',
             text: 'Which number is "Cinco"?',
             options: ['One', 'Five', 'Three', 'Two'],
             correctAnswerIndex: 1,
@@ -79,6 +104,7 @@ export const initialCourses: Course[] = [
                 timestamp: 8,
                 question: {
                     id: 'viq-1',
+                    type: 'MULTIPLE_CHOICE',
                     text: 'What does "Bien, gracias" mean?',
                     options: ['Hello, thank you', 'Good, thank you', 'My name is, thank you', 'Goodbye, thank you'],
                     correctAnswerIndex: 1,
@@ -88,6 +114,7 @@ export const initialCourses: Course[] = [
                 timestamp: 17,
                 question: {
                     id: 'viq-2',
+                    type: 'MULTIPLE_CHOICE',
                     text: 'What is a good response to "Mucho gusto"?',
                     options: ['Adiós', 'Hola', 'Igualmente', 'Gracias'],
                     correctAnswerIndex: 2,
@@ -108,12 +135,14 @@ export const initialCourses: Course[] = [
             questions: [
                 {
                     id: 'q6',
+                    type: 'MULTIPLE_CHOICE',
                     text: 'How do you say "Hello" in French?',
                     options: ['Bonjour', 'Au revoir', 'Merci', 'Oui'],
                     correctAnswerIndex: 0,
                 },
                 {
                     id: 'q7',
+                    type: 'MULTIPLE_CHOICE',
                     text: 'What does "Merci" mean?',
                     options: ['Yes', 'Goodbye', 'Thank you', 'Please'],
                     correctAnswerIndex: 2,

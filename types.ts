@@ -20,12 +20,43 @@ export interface User {
   password?: string;
 }
 
-export interface Question {
+export type QuestionType = 'MULTIPLE_CHOICE' | 'FILL_IN_THE_BLANK' | 'MATCHING' | 'SEQUENCING';
+
+export interface BaseQuestion {
   id: string;
   text: string;
+  type: QuestionType;
+}
+
+export interface MultipleChoiceQuestion extends BaseQuestion {
+  type: 'MULTIPLE_CHOICE';
   options: string[];
   correctAnswerIndex: number;
 }
+
+export interface FillInTheBlankQuestion extends BaseQuestion {
+  type: 'FILL_IN_THE_BLANK';
+  correctAnswer: string;
+}
+
+export interface MatchingItem {
+  id: string;
+  content: string;
+}
+
+export interface MatchingQuestion extends BaseQuestion {
+  type: 'MATCHING';
+  prompts: MatchingItem[];
+  answers: MatchingItem[]; // The correct answer is when prompt.id === answer.id
+}
+
+export interface SequencingQuestion extends BaseQuestion {
+  type: 'SEQUENCING';
+  items: string[]; // This is the correct order. The UI will shuffle them.
+}
+
+export type Question = MultipleChoiceQuestion | FillInTheBlankQuestion | MatchingQuestion | SequencingQuestion;
+
 
 export interface TranscriptItem {
   text: string;
@@ -34,7 +65,7 @@ export interface TranscriptItem {
 
 export interface VideoInteraction {
     timestamp: number;
-    question: Question;
+    question: MultipleChoiceQuestion;
 }
 
 export interface Lesson {

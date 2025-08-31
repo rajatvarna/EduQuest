@@ -42,6 +42,7 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
+  const [userAnswers, setUserAnswers] = useState<Record<string, boolean>>({});
   const [view, setView] = useState<View>('course_selection');
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
@@ -65,6 +66,7 @@ const App: React.FC = () => {
                 setUser(data.user);
                 setUserStats(data.userStats);
                 setCompletedLessonIds(new Set(data.completedLessonIds));
+                setUserAnswers(data.userAnswers);
                 setIsAuthenticated(true);
             }
         } catch (error) {
@@ -108,6 +110,7 @@ const App: React.FC = () => {
       setUser(data.user);
       setUserStats(data.userStats);
       setCompletedLessonIds(new Set(data.completedLessonIds));
+      setUserAnswers(data.userAnswers);
       setIsAuthenticated(true);
   }
 
@@ -116,6 +119,7 @@ const App: React.FC = () => {
     setUser(data.user);
     setUserStats(data.userStats);
     setCompletedLessonIds(new Set());
+    setUserAnswers({});
     setIsAuthenticated(true);
   }
   
@@ -150,8 +154,13 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAnswer = useCallback((isCorrect: boolean) => {
-    if (!userStats) return;
+  const handleAnswer = useCallback(async (questionId: string, isCorrect: boolean) => {
+    if (!userStats || !user) return;
+    
+    // Record the answer
+    const updatedAnswers = await api.recordAnswer({ userId: user.id, questionId, isCorrect });
+    setUserAnswers(updatedAnswers);
+
     if (isCorrect) {
       setUserStats(prev => prev ? ({ ...prev, xp: prev.xp + 10 }) : null);
     } else {
@@ -164,7 +173,7 @@ const App: React.FC = () => {
         return { ...prev, hearts: newHearts };
       });
     }
-  }, [userStats]);
+  }, [user, userStats]);
 
   const completeLesson = useCallback(async (lessonId: string) => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
@@ -209,6 +218,10 @@ const App: React.FC = () => {
     setCourses(updatedCourses);
     setView('course_selection');
   }
+  
+  const handleUpdateCourse = (course: Course) => {
+    setActiveCourse(course);
+  };
 
   const handleUpdateUser = async (updatedUser: User) => {
     const savedUser = await api.updateUser(updatedUser);
@@ -234,16 +247,19 @@ const App: React.FC = () => {
       case 'course_selection':
         return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} />;
       case 'course_view':
-        if (!activeCourse || !userStats) {
+        if (!activeCourse || !userStats || !user) {
             handleNavigateHome(); // Should not happen, but as a fallback
             return null;
         }
         return <CourseView 
             course={activeCourse} 
+            user={user}
             onStartLesson={startLesson} 
             userHearts={userStats.hearts} 
             onBack={handleNavigateHome}
             completedLessonIds={completedLessonIds}
+            userAnswers={userAnswers}
+            onUpdateCourse={handleUpdateCourse}
         />;
       case 'lesson':
         if (!activeLesson || !userStats) {

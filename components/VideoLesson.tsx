@@ -111,33 +111,35 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
 
   useEffect(() => {
     if (isPlaying && player) {
-      progressIntervalRef.current = window.setInterval(async () => {
-        const currentTime = await player.getCurrentTime();
-        setProgress(currentTime);
+      progressIntervalRef.current = window.setInterval(() => {
+        // FIX: The `player.getCurrentTime()` method returns a Promise, which cannot be directly passed to the `setProgress` state setter.
+        // We resolve the promise using `.then()` to get the current time as a number before updating the state and performing other checks.
+        player.getCurrentTime().then(currentTime => {
+            setProgress(currentTime);
 
-        if (lesson.transcript) {
-            // FIX: Replace findLastIndex with a compatible method for wider browser support.
-            let newIndex = -1;
-            for (let i = lesson.transcript.length - 1; i >= 0; i--) {
-                if (currentTime >= lesson.transcript[i].start) {
-                    newIndex = i;
-                    break;
+            if (lesson.transcript) {
+                // Replace findLastIndex with a compatible method for wider browser support.
+                let newIndex = -1;
+                for (let i = lesson.transcript.length - 1; i >= 0; i--) {
+                    if (currentTime >= lesson.transcript[i].start) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+                setActiveTranscriptIndex(newIndex);
+            }
+            
+            // Check for video interactions
+            if (lesson.videoInteractions) {
+                const interaction = lesson.videoInteractions.find(
+                    vi => currentTime >= vi.timestamp && !completedInteractions.has(vi.question.id)
+                );
+                if (interaction) {
+                    player.pauseVideo();
+                    setActiveInteraction(interaction);
                 }
             }
-            setActiveTranscriptIndex(newIndex);
-        }
-        
-        // Check for video interactions
-        if (lesson.videoInteractions) {
-            const interaction = lesson.videoInteractions.find(
-                vi => currentTime >= vi.timestamp && !completedInteractions.has(vi.question.id)
-            );
-            if (interaction) {
-                player.pauseVideo();
-                setActiveInteraction(interaction);
-            }
-        }
-
+        });
       }, 250);
     } else {
       clearProgressInterval();
@@ -256,6 +258,7 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
     );
   }
 
+  // The 'showinfo' parameter is deprecated for YouTube embeds and has been removed.
   const opts: YouTubeProps['opts'] = {
     height: '100%',
     width: '100%',
@@ -263,7 +266,6 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
       autoplay: 0,
       controls: 0,
       rel: 0,
-      showinfo: 0,
       modestbranding: 1,
       iv_load_policy: 3,
     },

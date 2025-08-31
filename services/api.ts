@@ -34,6 +34,9 @@ if (!DB.getItem('userStats')) {
 if (!DB.getItem('userProgress')) {
     DB.setItem('userProgress', {});
 }
+if (!DB.getItem('userAnswers')) {
+    DB.setItem('userAnswers', {});
+}
 
 
 // --- API SIMULATION ---
@@ -67,7 +70,7 @@ const verifyToken = (token: string): { userId: string } | null => {
 
 // --- AUTHENTICATION API ---
 
-export const login = async (email: string, password?: string): Promise<{ user: User; userStats: UserStats; completedLessonIds: string[]; token: string }> => {
+export const login = async (email: string, password?: string): Promise<{ user: User; userStats: UserStats; completedLessonIds: string[]; userAnswers: Record<string, boolean>; token: string }> => {
   await simulateNetwork();
   const users = DB.getItem<User[]>('users') || [];
   const user = users.find(u => u.email === email && u.password === password);
@@ -81,8 +84,9 @@ export const login = async (email: string, password?: string): Promise<{ user: U
   
   const userStats = (DB.getItem<Record<string, UserStats>>('userStats') || {})[user.id];
   const userProgress = (DB.getItem<Record<string, string[]>>('userProgress') || {})[user.id] || [];
+  const userAnswers = (DB.getItem<Record<string, Record<string, boolean>>>('userAnswers') || {})[user.id] || {};
 
-  return { user, userStats, completedLessonIds: userProgress, token };
+  return { user, userStats, completedLessonIds: userProgress, userAnswers, token };
 };
 
 export const register = async (credentials: Pick<User, 'name' | 'email' | 'password'>): Promise<{ user: User; userStats: UserStats; token: string }> => {
@@ -113,6 +117,10 @@ export const register = async (credentials: Pick<User, 'name' | 'email' | 'passw
     allStats[newUser.id] = newUserStats;
     DB.setItem('userStats', allStats);
 
+    const allAnswers = DB.getItem<Record<string, Record<string, boolean>>>('userAnswers') || {};
+    allAnswers[newUser.id] = {};
+    DB.setItem('userAnswers', allAnswers);
+
     const token = createToken({ userId: newUser.id });
     DB.setItem('authToken', token);
 
@@ -120,7 +128,7 @@ export const register = async (credentials: Pick<User, 'name' | 'email' | 'passw
 };
 
 
-export const getMe = async (): Promise<{ user: User; userStats: UserStats; completedLessonIds: string[] } | null> => {
+export const getMe = async (): Promise<{ user: User; userStats: UserStats; completedLessonIds: string[]; userAnswers: Record<string, boolean> } | null> => {
   await simulateNetwork(200);
   const token = DB.getItem<string>('authToken');
   if (!token) {
@@ -142,8 +150,9 @@ export const getMe = async (): Promise<{ user: User; userStats: UserStats; compl
   
   const userStats = (DB.getItem<Record<string, UserStats>>('userStats') || {})[user.id];
   const userProgress = (DB.getItem<Record<string, string[]>>('userProgress') || {})[user.id] || [];
+  const userAnswers = (DB.getItem<Record<string, Record<string, boolean>>>('userAnswers') || {})[user.id] || {};
   
-  return { user, userStats, completedLessonIds: userProgress };
+  return { user, userStats, completedLessonIds: userProgress, userAnswers };
 };
 
 export const logout = (): void => {
@@ -177,6 +186,18 @@ export const updateUser = async (updatedUser: User): Promise<User> => {
     DB.setItem('users', users);
     return users[userIndex];
 }
+
+export const recordAnswer = async ({ userId, questionId, isCorrect }: { userId: string; questionId: string; isCorrect: boolean }): Promise<Record<string, boolean>> => {
+    await simulateNetwork(100);
+    const allAnswers = DB.getItem<Record<string, Record<string, boolean>>>('userAnswers') || {};
+    if (!allAnswers[userId]) {
+        allAnswers[userId] = {};
+    }
+    allAnswers[userId][questionId] = isCorrect;
+    DB.setItem('userAnswers', allAnswers);
+    return allAnswers[userId];
+}
+
 
 export const completeLesson = async (
     { userId, lessonId, xpEarned, wasAlreadyCompleted }: 

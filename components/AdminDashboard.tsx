@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import * as pdfjsLib from 'pdfjs-dist';
-import { Course, Question, Lesson } from '../types';
+import { Course, Question, Lesson, MatchingItem } from '../types';
 import * as api from '../services/api';
 import { PlusIcon, SparklesIcon, DocumentArrowUpIcon, XMarkIcon } from './icons';
 
@@ -93,6 +93,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCourseCreated }) => {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
       
+      const questionSchema = {
+        type: Type.OBJECT,
+        properties: {
+          questionType: { type: Type.STRING, enum: ['MULTIPLE_CHOICE', 'FILL_IN_THE_BLANK', 'MATCHING', 'SEQUENCING'] },
+          text: { type: Type.STRING, description: "The question text. For FILL_IN_THE_BLANK, include '___' as a placeholder." },
+          // MULTIPLE_CHOICE
+          options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "For MULTIPLE_CHOICE only. An array of 4 option strings." },
+          correctAnswerIndex: { type: Type.INTEGER, description: "For MULTIPLE_CHOICE only. The 0-based index of the correct answer." },
+          // FILL_IN_THE_BLANK
+          correctAnswer: { type: Type.STRING, description: "For FILL_IN_THE_BLANK only. The word(s) that fill the blank." },
+          // MATCHING
+          matchingPairs: {
+            type: Type.ARRAY,
+            description: "For MATCHING only. An array of 3-4 objects, each with a 'prompt' and 'answer' key.",
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                prompt: { type: Type.STRING },
+                answer: { type: Type.STRING },
+              },
+              required: ['prompt', 'answer'],
+            },
+          },
+          // SEQUENCING
+          sequencingItems: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "For SEQUENCING only. An array of 3-5 strings in the correct order."
+          },
+        },
+        required: ['questionType', 'text'],
+      };
+
       const responseSchema = {
           type: Type.OBJECT,
           properties: {
@@ -109,16 +142,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCourseCreated }) => {
                   videoId: { type: Type.STRING, description: "For 'VIDEO' lessons, a placeholder ID like 'YOUTUBE_VIDEO_ID_HERE'. Omit for other types." },
                   questions: {
                     type: Type.ARRAY,
-                    description: "An array of 3-5 multiple-choice questions for 'QUIZ' lessons. Omit for other types.",
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        text: { type: Type.STRING, description: "The text of the question." },
-                        options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        correctAnswerIndex: { type: Type.INTEGER },
-                      },
-                      required: ['text', 'options', 'correctAnswerIndex'],
-                    },
+                    description: "An array of 3-5 questions for 'QUIZ' lessons. Omit for other types.",
+                    items: questionSchema,
                   },
                 },
                 required: ['title', 'type'],
@@ -136,8 +161,15 @@ Your task is to:
 3.  Structure the course with a variety of lesson types:
     - The first lesson should be a 'READING' type, with 'content' providing a summary or introduction.
     - For one of the most important concepts, create a 'VIDEO' lesson. For this, provide a short, engaging video 'script' as the 'content' and a placeholder 'videoId' ('YOUTUBE_VIDEO_ID_HERE').
-    - All other sections should be 'QUIZ' lessons, each with 3-5 multiple-choice 'questions'.
-4.  Ensure your entire output is a single, valid JSON object matching the provided schema. Do not include markdown formatting.
+    - All other sections should be 'QUIZ' lessons. For each QUIZ lesson, create 3-4 questions with a VARIETY of types: 'MULTIPLE_CHOICE', 'FILL_IN_THE_BLANK', 'MATCHING', and 'SEQUENCING'.
+4.  Follow these rules for creating questions in the JSON:
+    - **questionType:** MUST be one of 'MULTIPLE_CHOICE', 'FILL_IN_THE_BLANK', 'MATCHING', 'SEQUENCING'.
+    - **text:** The question prompt. For 'FILL_IN_THE_BLANK', include '___' where the blank should be.
+    - **For 'MULTIPLE_CHOICE':** Provide 'options' (an array of 4 strings) and a 'correctAnswerIndex'.
+    - **For 'FILL_IN_THE_BLANK':** Provide the 'correctAnswer' string.
+    - **For 'MATCHING':** Provide 'matchingPairs' (an array of {prompt, answer} objects).
+    - **For 'SEQUENCING':** Provide 'sequencingItems' (an array of strings in the correct order).
+5.  Ensure your entire output is a single, valid JSON object matching the provided schema. Do not include markdown formatting.
 
 Content to analyze:
 ---
@@ -160,17 +192,41 @@ ${contentToProcess.substring(0, 20000)}
       const newCourse: Course = {
         id: `course-${Date.now()}`,
         title: parsedCourse.title,
-        lessons: parsedCourse.lessons.map((lesson: any, lIndex: number): Lesson => ({
-          id: `lesson-${Date.now()}-${lIndex}`,
-          title: lesson.title,
-          type: lesson.type,
-          content: lesson.content,
-          videoId: lesson.videoId,
-          questions: lesson.questions?.map((q: Question, qIndex: number) => ({
-            ...q,
-            id: `q-${Date.now()}-${lIndex}-${qIndex}`,
-          })),
-        })),
+        lessons: parsedCourse.lessons.map((lesson: any, lIndex: number): Lesson => {
+          let questions;
+          if (lesson.questions) {
+            questions = lesson.questions.map((q: any, qIndex: number): Question => {
+              const baseQuestion = {
+                id: `q-${Date.now()}-${lIndex}-${qIndex}`,
+                text: q.text,
+              };
+              switch (q.questionType) {
+                case 'FILL_IN_THE_BLANK':
+                  return { ...baseQuestion, type: 'FILL_IN_THE_BLANK', correctAnswer: q.correctAnswer };
+                case 'MATCHING':
+                  return {
+                    ...baseQuestion,
+                    type: 'MATCHING',
+                    prompts: q.matchingPairs.map((p: {prompt: string}, i: number): MatchingItem => ({ id: `m-p-${i}`, content: p.prompt })),
+                    answers: q.matchingPairs.map((p: {answer: string}, i: number): MatchingItem => ({ id: `m-p-${i}`, content: p.answer })),
+                  };
+                case 'SEQUENCING':
+                  return { ...baseQuestion, type: 'SEQUENCING', items: q.sequencingItems };
+                case 'MULTIPLE_CHOICE':
+                default:
+                  return { ...baseQuestion, type: 'MULTIPLE_CHOICE', options: q.options, correctAnswerIndex: q.correctAnswerIndex };
+              }
+            });
+          }
+          return {
+            id: `lesson-${Date.now()}-${lIndex}`,
+            title: lesson.title,
+            type: lesson.type,
+            content: lesson.content,
+            videoId: lesson.videoId,
+            questions: questions,
+          };
+        }),
       };
 
       await onCourseCreated(newCourse);
