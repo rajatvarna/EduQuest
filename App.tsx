@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Course, Lesson, UserStats, User } from './types';
+import { Course, Lesson, UserStats, User, LevelInfo } from './types';
 import * as api from './services/api';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
@@ -18,8 +18,26 @@ import { ChatBubbleLeftRightIcon } from './components/icons';
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
 
+const XP_PER_LEVEL = 100;
+
+const calculateLevelInfo = (xp: number): LevelInfo => {
+    const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+    const xpForCurrentLevel = (level - 1) * XP_PER_LEVEL;
+    const xpForNextLevel = level * XP_PER_LEVEL;
+    const xpInLevel = xp - xpForCurrentLevel;
+    return {
+        level,
+        xpInLevel,
+        xpForNextLevel: XP_PER_LEVEL,
+        progress: (xpInLevel / XP_PER_LEVEL) * 100,
+        totalXpForNextLevel: xpForNextLevel,
+    };
+};
+
+
 const App: React.FC = () => {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -28,7 +46,7 @@ const App: React.FC = () => {
   const [activeCourse, setActiveCourse] = useState<Course | null>(null);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [lessonCompleteData, setLessonCompleteData] = useState<{ pointsEarned: number } | null>(null);
+  const [lessonCompleteData, setLessonCompleteData] = useState<{ xpEarned: number } | null>(null);
   const [theme, setTheme] = useState<Theme>('light');
   const [isLoading, setIsLoading] = useState(true);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -74,6 +92,12 @@ const App: React.FC = () => {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+      if (userStats) {
+          setLevelInfo(calculateLevelInfo(userStats.xp));
+      }
+  }, [userStats]);
 
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
@@ -129,7 +153,7 @@ const App: React.FC = () => {
   const handleAnswer = useCallback((isCorrect: boolean) => {
     if (!userStats) return;
     if (isCorrect) {
-      setUserStats(prev => prev ? ({ ...prev, points: prev.points + 10 }) : null);
+      setUserStats(prev => prev ? ({ ...prev, xp: prev.xp + 10 }) : null);
     } else {
       setUserStats(prev => {
         if (!prev) return null;
@@ -146,11 +170,11 @@ const App: React.FC = () => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
     if (!lesson || !user || !userStats) return;
 
-    let pointsEarned = 0;
+    let xpEarned = 0;
     if (lesson.type === 'QUIZ' && lesson.questions) {
-      pointsEarned = lesson.questions.length * 10;
+      xpEarned = lesson.questions.length * 10;
     } else if (lesson.type === 'READING' || lesson.type === 'VIDEO') {
-      pointsEarned = 5;
+      xpEarned = 15;
     }
     
     const wasAlreadyCompleted = completedLessonIds.has(lessonId);
@@ -158,14 +182,14 @@ const App: React.FC = () => {
     const { updatedUserStats, updatedCompletedLessonIds } = await api.completeLesson({
         userId: user.id,
         lessonId,
-        pointsEarned,
+        xpEarned,
         wasAlreadyCompleted
     });
 
     setUserStats(updatedUserStats);
     setCompletedLessonIds(new Set(updatedCompletedLessonIds));
     
-    setLessonCompleteData({ pointsEarned });
+    setLessonCompleteData({ xpEarned });
     setActiveLesson(null);
   }, [activeCourse, completedLessonIds, user, userStats]);
 
@@ -255,13 +279,14 @@ const App: React.FC = () => {
        case 'admin':
          return <AdminDashboard onCourseCreated={handleCourseCreated} />;
        case 'profile':
-         if (!user || !userStats) {
+         if (!user || !userStats || !levelInfo) {
              handleLogout(); // Should not happen if authenticated, but as fallback
              return null;
          }
          return <UserProfile 
             user={user}
             userStats={userStats}
+            levelInfo={levelInfo}
             onUpdateUser={handleUpdateUser}
             onLogout={handleLogout}
             onNavigateHome={handleNavigateHome}
@@ -275,10 +300,11 @@ const App: React.FC = () => {
     <div className="antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
       {!isAuthenticated ? (
         <Auth onLogin={handleLogin} onRegister={handleRegister} />
-      ) : userStats ? (
+      ) : userStats && levelInfo ? (
         <>
           <Header 
             userStats={userStats} 
+            levelInfo={levelInfo}
             onNavigateToAdmin={() => setView('admin')}
             onNavigateHome={handleNavigateHome}
             onNavigateToProfile={() => setView('profile')}
@@ -299,7 +325,7 @@ const App: React.FC = () => {
             <LessonCompleteModal 
               isOpen={!!lessonCompleteData}
               onClose={handleCloseCompleteModal}
-              pointsEarned={lessonCompleteData.pointsEarned}
+              xpEarned={lessonCompleteData.xpEarned}
               currentStreak={userStats.streak}
             />
           )}

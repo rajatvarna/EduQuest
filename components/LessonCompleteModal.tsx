@@ -4,11 +4,11 @@ import { StarIcon, FlameIcon } from './icons';
 interface LessonCompleteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pointsEarned: number;
+  xpEarned: number;
   currentStreak: number;
 }
 
-const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, pointsEarned, currentStreak }) => {
+const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak }) => {
   if (!isOpen) return null;
 
   return (
@@ -26,10 +26,10 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
             
             <div className="space-y-4 my-6">
                 <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">
-                    <span className="font-semibold text-slate-600 dark:text-slate-300">Points Earned</span>
+                    <span className="font-semibold text-slate-600 dark:text-slate-300">XP Gained</span>
                     <div className="flex items-center font-bold text-lg text-yellow-500">
                         <StarIcon className="w-6 h-6 mr-1" />
-                        <span>+{pointsEarned}</span>
+                        <span>+{xpEarned}</span>
                     </div>
                 </div>
                 <div className="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-lg flex justify-between items-center">

@@ -35,7 +35,7 @@ This phase focuses on building the user-facing application and connecting it to 
 
 ### Frontend Setup & Core UI
 - [x] **Initialize React project with TypeScript:** The project is set up and running.
-- [x] **Implement core gamification UI:** The `Header` component displays points, streak, and hearts.
+- [x] **Implement core gamification UI:** The `Header` component displays XP, level, streak, and hearts.
 - [x] **Implement learning content UI:** The `Dashboard` shows the course path, and the `Lesson` component provides the interactive quiz experience.
 - [x] **Implement freemium model UI:** The `SubscriptionModal` provides an upsell when a user runs out of hearts.
 
@@ -56,14 +56,13 @@ These tasks are priorities for evolving the application after the initial founda
 
 ### Core Learning Experience
 - [ ] **Interactive Reading Lessons:**
-    - [ ] Implement inline, non-graded comprehension checks.
     - [ ] Add highlighting and note-taking functionality for users.
 - [ ] **Smarter Quizzes:**
     - [ ] Implement a Spaced Repetition System (SRS) for reviewing difficult questions.
     - [ ] Enhance AI generator to create diverse question types (fill-in-the-blank, matching, etc.).
-- [ ] **Engaging Video Lessons:**
+- [x] **Engaging Video Lessons:**
     - [ ] Add an interactive, clickable transcript that syncs with video playback.
-    - [ ] Implement in-video pop-up questions to check for active viewing.
+    - [x] Implement in-video pop-up questions to check for active viewing.
 
 ### Gamification & Motivation
 - [ ] **Achievements System:**
@@ -84,15 +83,15 @@ These tasks are priorities for evolving the application after the initial founda
     - [ ] Make QuestBot proactively offer help when a user struggles with a quiz.
 - [ ] **Personalized Learning:**
     - [ ] Use AI to analyze user performance and generate personalized review lessons.
-- [ ] **AI Content Generation:**
-    - [ ] Enhance Admin Dashboard to auto-summarize text for `READING` lessons.
+- [x] **AI Content Generation:**
+    - [x] Enhance Admin Dashboard to generate multi-format courses (Reading, Video, Quiz).
     - [ ] Enhance Admin Dashboard to suggest lesson topics from source material.
 
 ### User Profile & Progression
 - [x] **Create a dedicated User Profile page.**
 - [x] **Allow users to view stats, change display name, and update avatar.**
-- [ ] **Visual Activity Tracking:**
-    - [ ] Add a GitHub-style activity heatmap to the profile page.
+- [x] **Visual Activity Tracking:**
+    - [x] Add a GitHub-style activity heatmap to the profile page.
 - [ ] **Performance Analytics:**
     - [ ] Display charts on the profile showing performance breakdowns (e.g., accuracy by course).
 - [x] **Visually indicate completed lessons on the `CourseView`.**

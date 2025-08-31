@@ -1,7 +1,15 @@
 export interface UserStats {
-  points: number;
+  xp: number;
   streak: number;
   hearts: number;
+}
+
+export interface LevelInfo {
+    level: number;
+    xpInLevel: number;
+    xpForNextLevel: number;
+    progress: number;
+    totalXpForNextLevel: number;
 }
 
 export interface User {
@@ -24,15 +32,20 @@ export interface TranscriptItem {
   start: number; // in seconds
 }
 
+export interface VideoInteraction {
+    timestamp: number;
+    question: Question;
+}
+
 export interface Lesson {
   id:string;
   title: string;
   type: 'QUIZ' | 'READING' | 'VIDEO';
   questions?: Question[];
-  content?: string; // For READING type
+  content?: string; // For READING type or VIDEO script
   videoId?: string; // For VIDEO type (e.g., YouTube video ID)
-  inlineQuestions?: Question[]; // For interactive READING type
   transcript?: TranscriptItem[];
+  videoInteractions?: VideoInteraction[];
 }
 
 export interface Course {

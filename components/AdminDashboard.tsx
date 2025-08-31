@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import * as pdfjsLib from 'pdfjs-dist';
-import { Course, Question } from '../types';
+import { Course, Question, Lesson } from '../types';
 import * as api from '../services/api';
 import { PlusIcon, SparklesIcon, DocumentArrowUpIcon, XMarkIcon } from './icons';
 
@@ -99,52 +99,45 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCourseCreated }) => {
             title: { type: Type.STRING, description: "A concise, engaging title for the entire course." },
             lessons: {
               type: Type.ARRAY,
-              description: "An array of lessons, one for each major section or chapter identified in the text.",
+              description: "An array of lessons covering the main sections of the text.",
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  title: { type: Type.STRING, description: "A clear, descriptive title for this lesson, based on its section." },
+                  title: { type: Type.STRING, description: "A clear, descriptive title for this lesson." },
+                  type: { type: Type.STRING, description: "The type of lesson: 'READING', 'VIDEO', or 'QUIZ'." },
+                  content: { type: Type.STRING, description: "For 'READING' lessons, the summarized text content. For 'VIDEO' lessons, a short, engaging video script. Omit for 'QUIZ' lessons." },
+                  videoId: { type: Type.STRING, description: "For 'VIDEO' lessons, a placeholder ID like 'YOUTUBE_VIDEO_ID_HERE'. Omit for other types." },
                   questions: {
                     type: Type.ARRAY,
-                    description: "An array of 3 to 5 multiple-choice questions for this lesson.",
+                    description: "An array of 3-5 multiple-choice questions for 'QUIZ' lessons. Omit for other types.",
                     items: {
                       type: Type.OBJECT,
                       properties: {
                         text: { type: Type.STRING, description: "The text of the question." },
-                        options: {
-                          type: Type.ARRAY,
-                          description: "An array of exactly 4 string options for the question.",
-                          items: { type: Type.STRING },
-                        },
-                        correctAnswerIndex: { type: Type.INTEGER, description: "The 0-indexed integer of the correct answer in the options array." },
+                        options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        correctAnswerIndex: { type: Type.INTEGER },
                       },
                       required: ['text', 'options', 'correctAnswerIndex'],
                     },
                   },
                 },
-                required: ['title', 'questions'],
+                required: ['title', 'type'],
               },
             },
           },
           required: ['title', 'lessons'],
       };
 
-      const prompt = `You are an expert instructional designer tasked with converting raw text into a structured mini-course for an EdTech platform.
-
-Analyze the following content and identify its main sections or chapters. Create a comprehensive course based on this structure.
-
-Your output must be a single JSON object with the following schema:
-1.  A concise, engaging 'title' for the entire course.
-2.  An array of 'lessons', one for each major section you identify.
-3.  Each lesson object in the array must have:
-    a. A clear, descriptive 'title'.
-    b. An array of 3 to 5 multiple-choice 'questions' that test the key concepts from that section.
-4.  Each question object must have:
-    a. The question 'text'.
-    b. An array of exactly 4 string 'options'.
-    c. The 'correctAnswerIndex' (an integer from 0 to 3).
-
-Do not include any markdown formatting like \`\`\`json in your response.
+      const prompt = `You are an expert instructional designer creating a multi-format mini-course from the provided text.
+      
+Your task is to:
+1.  Create a concise, engaging 'title' for the entire course.
+2.  Analyze the text and break it down into logical sections. Create a 'lessons' array based on these sections.
+3.  Structure the course with a variety of lesson types:
+    - The first lesson should be a 'READING' type, with 'content' providing a summary or introduction.
+    - For one of the most important concepts, create a 'VIDEO' lesson. For this, provide a short, engaging video 'script' as the 'content' and a placeholder 'videoId' ('YOUTUBE_VIDEO_ID_HERE').
+    - All other sections should be 'QUIZ' lessons, each with 3-5 multiple-choice 'questions'.
+4.  Ensure your entire output is a single, valid JSON object matching the provided schema. Do not include markdown formatting.
 
 Content to analyze:
 ---
@@ -167,11 +160,13 @@ ${contentToProcess.substring(0, 20000)}
       const newCourse: Course = {
         id: `course-${Date.now()}`,
         title: parsedCourse.title,
-        lessons: parsedCourse.lessons.map((lesson: any, lIndex: number) => ({
+        lessons: parsedCourse.lessons.map((lesson: any, lIndex: number): Lesson => ({
           id: `lesson-${Date.now()}-${lIndex}`,
           title: lesson.title,
-          type: 'QUIZ',
-          questions: lesson.questions.map((q: Question, qIndex: number) => ({
+          type: lesson.type,
+          content: lesson.content,
+          videoId: lesson.videoId,
+          questions: lesson.questions?.map((q: Question, qIndex: number) => ({
             ...q,
             id: `q-${Date.now()}-${lIndex}-${qIndex}`,
           })),

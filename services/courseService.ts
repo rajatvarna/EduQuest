@@ -34,15 +34,7 @@ export const initialCourses: Course[] = [
         id: 'lesson-new-1',
         title: 'Understanding "Ser" and "Estar"',
         type: 'READING',
-        content: `In Spanish, both "ser" and "estar" translate to "to be" in English, but they are used in different contexts and are not interchangeable. Understanding the difference is crucial for speaking Spanish correctly.\n\n**Ser is used for permanent or lasting attributes.** If you're talking about something that is a fundamental characteristic of a person or thing, you use "ser". Think of it with the acronym DOCTOR:\n- **D**escription: "Yo soy alto" (I am tall).\n- **O**ccupation: "Ella es médica" (She is a doctor).\n- **C**haracteristic: "Ellos son inteligentes" (They are intelligent).\n- **T**ime: "Son las dos de la tarde" (It is 2 in the afternoon).\n- **O**rigin: "Somos de México" (We are from Mexico).\n- **R**elationship: "Él es mi hermano" (He is my brother).\n\n**Estar is used for temporary states and locations.** If you are talking about how something is at the moment, or where it is located, you use "estar". Think of it with the acronym PLACE:\n- **P**osition: "El libro está en la mesa" (The book is on the table).\n- **L**ocation: "Estamos en el parque" (We are in the park).\n- **A**ction: "Estoy comiendo" (I am eating - progressive tense).\n- **C**ondition: "Ella está cansada" (She is tired).\n- **E**motion: "Yo estoy feliz" (I am happy).\n\nRemember, a person's location is always described with "estar", even if they live there permanently. "Mi casa está en Madrid" (My house is in Madrid). Mastering "ser" and "estar" takes practice, but these rules are a great starting point!\n\nNow, let's test your understanding before you finish. [QUESTION-1]`,
-        inlineQuestions: [
-            {
-                id: 'iq-1',
-                text: 'Which verb is used for permanent or lasting attributes, like an occupation or a description?',
-                options: ['Ser', 'Estar'],
-                correctAnswerIndex: 0,
-            }
-        ]
+        content: `In Spanish, both "ser" and "estar" translate to "to be" in English, but they are used in different contexts and are not interchangeable. Understanding the difference is crucial for speaking Spanish correctly.\n\n**Ser is used for permanent or lasting attributes.** If you're talking about something that is a fundamental characteristic of a person or thing, you use "ser". Think of it with the acronym DOCTOR:\n- **D**escription: "Yo soy alto" (I am tall).\n- **O**ccupation: "Ella es médica" (She is a doctor).\n- **C**haracteristic: "Ellos son inteligentes" (They are intelligent).\n- **T**ime: "Son las dos de la tarde" (It is 2 in the afternoon).\n- **O**rigin: "Somos de México" (We are from Mexico).\n- **R**elationship: "Él es mi hermano" (He is my brother).\n\n**Estar is used for temporary states and locations.** If you are talking about how something is at the moment, or where it is located, you use "estar". Think of it with the acronym PLACE:\n- **P**osition: "El libro está en la mesa" (The book is on the table).\n- **L**ocation: "Estamos en el parque" (We are in the park).\n- **A**ction: "Estoy comiendo" (I am eating - progressive tense).\n- **C**ondition: "Ella está cansada" (She is tired).\n- **E**motion: "Yo estoy feliz" (I am happy).\n\nRemember, a person's location is always described with "estar", even if they live there permanently. "Mi casa está en Madrid" (My house is in Madrid). Mastering "ser" and "estar" takes practice, but these rules are a great starting point!`,
       },
       {
         id: 'lesson-2',
@@ -81,6 +73,26 @@ export const initialCourses: Course[] = [
           { start: 18.5, text: "¿De dónde es usted?" },
           { start: 20.2, text: "Soy de los Estados Unidos." },
           { start: 22.5, text: "Ah, ¡qué bien!" }
+        ],
+        videoInteractions: [
+            {
+                timestamp: 8,
+                question: {
+                    id: 'viq-1',
+                    text: 'What does "Bien, gracias" mean?',
+                    options: ['Hello, thank you', 'Good, thank you', 'My name is, thank you', 'Goodbye, thank you'],
+                    correctAnswerIndex: 1,
+                }
+            },
+            {
+                timestamp: 17,
+                question: {
+                    id: 'viq-2',
+                    text: 'What is a good response to "Mucho gusto"?',
+                    options: ['Adiós', 'Hola', 'Igualmente', 'Gracias'],
+                    correctAnswerIndex: 2,
+                }
+            }
         ]
       }
     ],

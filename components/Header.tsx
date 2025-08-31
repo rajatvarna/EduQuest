@@ -1,9 +1,10 @@
 import React from 'react';
-import { UserStats } from '../types';
+import { UserStats, LevelInfo } from '../types';
 import { StarIcon, FlameIcon, HeartIcon, UserCircleIcon, WrenchScrewdriverIcon, SunIcon, MoonIcon, EduQuestLogo } from './icons';
 
 interface HeaderProps {
   userStats: UserStats;
+  levelInfo: LevelInfo;
   onNavigateToAdmin: () => void;
   onNavigateHome: () => void;
   onNavigateToProfile: () => void;
@@ -11,7 +12,7 @@ interface HeaderProps {
   toggleTheme: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userStats, onNavigateToAdmin, onNavigateHome, onNavigateToProfile, theme, toggleTheme }) => {
+const Header: React.FC<HeaderProps> = ({ userStats, levelInfo, onNavigateToAdmin, onNavigateHome, onNavigateToProfile, theme, toggleTheme }) => {
   return (
     <header className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center max-w-5xl">
@@ -20,15 +21,22 @@ const Header: React.FC<HeaderProps> = ({ userStats, onNavigateToAdmin, onNavigat
             <span className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">EduQuest</span>
         </button>
         <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="flex items-center space-x-2 text-yellow-600 dark:text-yellow-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm transition-transform hover:scale-105 cursor-pointer">
-            <StarIcon className="h-5 w-5" />
-            <span>{userStats.points}</span>
+          
+          <div className="flex items-center space-x-2 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm">
+             <div className="text-teal-500 dark:text-teal-400">Lvl {levelInfo.level}</div>
+             <div className="w-16 sm:w-20 h-2 bg-slate-300 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="h-full bg-teal-500" style={{width: `${levelInfo.progress}%`}}></div>
+             </div>
           </div>
-          <div className="flex items-center space-x-2 text-orange-600 dark:text-orange-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm transition-transform hover:scale-105 cursor-pointer">
+          <div className="flex items-center space-x-2 text-yellow-600 dark:text-yellow-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm">
+            <StarIcon className="h-5 w-5" />
+            <span>{userStats.xp}</span>
+          </div>
+          <div className="hidden sm:flex items-center space-x-2 text-orange-600 dark:text-orange-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm">
             <FlameIcon className="h-5 w-5" />
             <span>{userStats.streak}</span>
           </div>
-          <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm transition-transform hover:scale-105 cursor-pointer">
+          <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-sm">
             <HeartIcon className="h-5 w-5" />
             <span>{userStats.hearts}</span>
           </div>

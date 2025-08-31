@@ -27,8 +27,8 @@ if (!DB.getItem('users')) {
 }
 if (!DB.getItem('userStats')) {
     DB.setItem('userStats', {
-        'user-1': { points: 120, streak: 3, hearts: 5 },
-        'user-social': { points: 50, streak: 1, hearts: 5 },
+        'user-1': { xp: 120, streak: 3, hearts: 5 },
+        'user-social': { xp: 50, streak: 1, hearts: 5 },
     });
 }
 if (!DB.getItem('userProgress')) {
@@ -101,7 +101,7 @@ export const register = async (credentials: Pick<User, 'name' | 'email' | 'passw
     };
     
     const newUserStats: UserStats = {
-        points: 0,
+        xp: 0,
         streak: 0,
         hearts: 5,
     };
@@ -179,8 +179,8 @@ export const updateUser = async (updatedUser: User): Promise<User> => {
 }
 
 export const completeLesson = async (
-    { userId, lessonId, pointsEarned, wasAlreadyCompleted }: 
-    { userId: string; lessonId: string; pointsEarned: number; wasAlreadyCompleted: boolean }
+    { userId, lessonId, xpEarned, wasAlreadyCompleted }: 
+    { userId: string; lessonId: string; xpEarned: number; wasAlreadyCompleted: boolean }
 ): Promise<{ updatedUserStats: UserStats; updatedCompletedLessonIds: string[] }> => {
     await simulateNetwork(300);
 
@@ -191,11 +191,12 @@ export const completeLesson = async (
     const currentUserProgress = allProgress[userId] || [];
     
     if (!wasAlreadyCompleted) {
-        currentUserStats.points += pointsEarned;
+        currentUserStats.xp += xpEarned;
         currentUserStats.streak += 1;
         currentUserProgress.push(lessonId);
     } else {
-        currentUserStats.points += pointsEarned; // Only add points, no streak
+        // Only award a small amount of XP for reviewing
+        currentUserStats.xp += Math.floor(xpEarned / 4);
     }
 
     allStats[userId] = currentUserStats;

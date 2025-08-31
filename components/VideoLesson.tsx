@@ -1,9 +1,84 @@
 import React, { useState, useRef, useEffect } from 'react';
 import YouTube from 'react-youtube';
-// FIX: Import YouTubeProps for explicit typing of player options.
 import type { YouTubePlayer, YouTubeProps } from 'react-youtube';
-import { Lesson } from '../types';
-import { ArrowLeftIcon, PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from './icons';
+import { Lesson, VideoInteraction, Question } from '../types';
+import { ArrowLeftIcon, PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon, XMarkIcon, CheckIcon } from './icons';
+
+interface InteractionModalProps {
+    interaction: VideoInteraction;
+    onAnswer: (isCorrect: boolean) => void;
+}
+
+const InteractionModal: React.FC<InteractionModalProps> = ({ interaction, onAnswer }) => {
+    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+    const isCorrect = selectedAnswer === interaction.question.correctAnswerIndex;
+
+    const handleSelect = (index: number) => {
+        if (isAnswered) return;
+        setSelectedAnswer(index);
+    };
+
+    const handleCheck = () => {
+        if (selectedAnswer === null) return;
+        setIsAnswered(true);
+        setTimeout(() => {
+            onAnswer(isCorrect);
+        }, 1500); // Wait a bit before closing
+    };
+    
+    const getButtonClass = (index: number) => {
+        if (!isAnswered) {
+          return selectedAnswer === index
+            ? 'bg-teal-100 dark:bg-teal-900/50 border-teal-500 ring-2 ring-teal-500/30'
+            : 'bg-white dark:bg-slate-700 hover:bg-slate-100/50 dark:hover:bg-slate-600/50 border-slate-300 dark:border-slate-600';
+        }
+    
+        if (index === interaction.question.correctAnswerIndex) {
+          return 'bg-green-100 dark:bg-green-900/50 border-green-600 text-green-800 dark:text-green-200';
+        }
+        if (index === selectedAnswer) {
+          return 'bg-red-100 dark:bg-red-900/50 border-red-600 text-red-800 dark:text-red-200';
+        }
+        return 'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 opacity-60';
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-lg w-full transform transition-all animate-jump-in border border-slate-200 dark:border-slate-700">
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-6 text-center">{interaction.question.text}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {interaction.question.options.map((option, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleSelect(index)}
+                            disabled={isAnswered}
+                            className={`p-4 rounded-xl border-b-4 text-lg font-semibold w-full text-left transition-all ${getButtonClass(index)}`}
+                        >
+                            {option}
+                        </button>
+                    ))}
+                </div>
+                 <div className={`mt-6 transition-opacity ${isAnswered ? 'opacity-0' : 'opacity-100'}`}>
+                    <button
+                        onClick={handleCheck}
+                        disabled={selectedAnswer === null}
+                        className="w-full py-3 text-lg font-bold text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 rounded-xl disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed transition-all shadow-md"
+                    >
+                        Check
+                    </button>
+                </div>
+                {isAnswered && (
+                     <div className="mt-6 flex items-center justify-center animate-fade-in text-xl font-bold">
+                        {isCorrect ? <CheckIcon className="w-8 h-8 mr-2 text-green-600 dark:text-green-400"/> : <XMarkIcon className="w-8 h-8 mr-2 text-red-600 dark:text-red-400"/>}
+                        <span className={`${isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>{isCorrect ? "Correct!" : "Incorrect!"}</span>
+                     </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 
 interface VideoLessonProps {
   lesson: Lesson;
@@ -20,6 +95,8 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [activeTranscriptIndex, setActiveTranscriptIndex] = useState(-1);
+  const [activeInteraction, setActiveInteraction] = useState<VideoInteraction | null>(null);
+  const [completedInteractions, setCompletedInteractions] = useState<Set<string>>(new Set());
 
   const progressIntervalRef = useRef<number | null>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
@@ -34,34 +111,44 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
 
   useEffect(() => {
     if (isPlaying && player) {
-      // FIX: Use an async callback to await the player's current time.
       progressIntervalRef.current = window.setInterval(async () => {
         const currentTime = await player.getCurrentTime();
         setProgress(currentTime);
 
         if (lesson.transcript) {
+            // FIX: Replace findLastIndex with a compatible method for wider browser support.
             let newIndex = -1;
-            for (let i = 0; i < lesson.transcript.length; i++) {
+            for (let i = lesson.transcript.length - 1; i >= 0; i--) {
                 if (currentTime >= lesson.transcript[i].start) {
                     newIndex = i;
-                } else {
                     break;
                 }
             }
             setActiveTranscriptIndex(newIndex);
         }
+        
+        // Check for video interactions
+        if (lesson.videoInteractions) {
+            const interaction = lesson.videoInteractions.find(
+                vi => currentTime >= vi.timestamp && !completedInteractions.has(vi.question.id)
+            );
+            if (interaction) {
+                player.pauseVideo();
+                setActiveInteraction(interaction);
+            }
+        }
+
       }, 250);
     } else {
       clearProgressInterval();
     }
     return () => clearProgressInterval();
-  }, [isPlaying, player, lesson.transcript]);
+  }, [isPlaying, player, lesson.transcript, lesson.videoInteractions, completedInteractions]);
   
   useEffect(() => {
     if (activeTranscriptIndex > -1 && transcriptContainerRef.current) {
       const activeElement = transcriptContainerRef.current.children[activeTranscriptIndex] as HTMLElement;
       if (activeElement) {
-        // Check if element is in view before scrolling
         const containerRect = transcriptContainerRef.current.getBoundingClientRect();
         const elementRect = activeElement.getBoundingClientRect();
         if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
@@ -143,6 +230,14 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
       if (!isPlaying) player.playVideo();
     }
   };
+  
+  const handleInteractionAnswer = (isCorrect: boolean) => {
+      if (activeInteraction) {
+          setCompletedInteractions(prev => new Set(prev).add(activeInteraction.question.id));
+          setActiveInteraction(null);
+          player?.playVideo();
+      }
+  }
 
   if (!lesson.videoId) {
     return (
@@ -153,12 +248,14 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
             </button>
             <h1 className="text-2xl md:text-3xl font-bold">{lesson.title}</h1>
          </div>
-        <p>Video not found for this lesson.</p>
+         <div className="flex-grow prose prose-lg dark:prose-invert max-w-none bg-white dark:bg-slate-800/50 rounded-xl p-6 md:p-8 overflow-y-auto mb-24 border border-slate-200 dark:border-slate-800 shadow-inner">
+            <h2 className="text-xl font-semibold mb-4">Video Script</h2>
+            <p>{lesson.content || "No video script available for this lesson."}</p>
+         </div>
       </div>
     );
   }
 
-  // FIX: Explicitly type `opts` to match `react-youtube`'s expected props.
   const opts: YouTubeProps['opts'] = {
     height: '100%',
     width: '100%',
@@ -174,6 +271,7 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   
   return (
     <div className="flex flex-col h-full animate-fade-in">
+      {activeInteraction && <InteractionModal interaction={activeInteraction} onAnswer={handleInteractionAnswer} />}
       <div className="flex items-center mb-6">
         <button onClick={onExit} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 mr-4">
           <ArrowLeftIcon className="w-6 h-6" />

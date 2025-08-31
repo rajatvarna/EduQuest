@@ -21,14 +21,14 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose, 
         </div>
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">You ran out of hearts!</h2>
         <p className="text-slate-500 dark:text-slate-400 mb-6">
-          Get EduQuest Pro for unlimited hearts, no ads, and to support free education. For now, you can get more hearts for free.
+          Get EduQuest Pro for unlimited hearts and exclusive features. For now, you can get a free refill to continue learning!
         </p>
         <div className="space-y-3">
           <button 
             onClick={onSubscribe}
             className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-105 shadow-lg"
           >
-            Get Unlimited Hearts
+            Get Free Refill
           </button>
           <button 
             onClick={onClose}
