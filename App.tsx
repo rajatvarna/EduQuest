@@ -245,7 +245,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch(view) {
       case 'course_selection':
-        return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} />;
+        return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} completedLessonIds={completedLessonIds} />;
       case 'course_view':
         if (!activeCourse || !userStats || !user) {
             handleNavigateHome(); // Should not happen, but as a fallback
@@ -308,7 +308,7 @@ const App: React.FC = () => {
             onNavigateHome={handleNavigateHome}
          />;
       default:
-        return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} />;
+        return <CourseSelection courses={courses} onSelectCourse={handleSelectCourse} completedLessonIds={completedLessonIds} />;
     }
   }
 
