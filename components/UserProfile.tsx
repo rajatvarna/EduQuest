@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, UserStats, LevelInfo } from '../types';
-import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon } from './icons';
+import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon, XMarkIcon } from './icons';
 import ActivityHeatmap from './ActivityHeatmap';
 
 interface UserProfileProps {
@@ -16,6 +16,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarUrlInput, setAvatarUrlInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   useEffect(() => {
@@ -60,8 +62,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
       const reader = new FileReader();
       reader.onloadend = () => {
         onUpdateUser({ ...user, avatarUrl: reader.result as string });
+        setIsAvatarModalOpen(false);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSetAvatarFromUrl = () => {
+    if (avatarUrlInput.trim()) {
+      try {
+        // Basic validation for URL format
+        new URL(avatarUrlInput);
+        onUpdateUser({ ...user, avatarUrl: avatarUrlInput.trim() });
+        setIsAvatarModalOpen(false);
+        setAvatarUrlInput('');
+      } catch (_) {
+        alert("Please enter a valid image URL.");
+      }
     }
   };
 
@@ -97,7 +114,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
                     )}
                 </div>
                 <button 
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => setIsAvatarModalOpen(true)}
                     className="absolute bottom-1 right-1 bg-teal-500 text-white p-2 rounded-full hover:bg-teal-600 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-800 focus:ring-teal-500"
                     aria-label="Change avatar"
                     title="Change avatar"
@@ -188,6 +205,66 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
           </button>
         </div>
       </div>
+
+      {/* Avatar Change Modal */}
+      {isAvatarModalOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setIsAvatarModalOpen(false)}>
+              <div 
+                  className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all animate-jump-in border border-slate-200 dark:border-slate-700"
+                  onClick={e => e.stopPropagation()}
+              >
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Change Avatar</h3>
+                    <button onClick={() => setIsAvatarModalOpen(false)} className="p-2 rounded-full text-slate-500 hover:text-teal-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-teal-400 dark:hover:bg-slate-800">
+                        <XMarkIcon className="w-6 h-6" />
+                    </button>
+                  </div>
+                  <div className="space-y-6">
+                      {/* Upload Option */}
+                      <div>
+                          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Upload from your device</p>
+                          <button
+                              onClick={() => fileInputRef.current?.click()}
+                              className="w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                          >
+                              Choose File...
+                          </button>
+                      </div>
+
+                      <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-slate-300 dark:border-slate-700"></div>
+                          </div>
+                          <div className="relative flex justify-center text-sm">
+                              <span className="px-2 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">OR</span>
+                          </div>
+                      </div>
+
+                      {/* URL Option */}
+                      <div>
+                         <label htmlFor="avatarUrl" className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Paste an image URL</label>
+                         <div className="flex gap-2">
+                              <input
+                                  id="avatarUrl"
+                                  type="text"
+                                  value={avatarUrlInput}
+                                  onChange={(e) => setAvatarUrlInput(e.target.value)}
+                                  placeholder="https://..."
+                                  className="flex-grow w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-white dark:bg-slate-700/50"
+                              />
+                              <button
+                                  onClick={handleSetAvatarFromUrl}
+                                  className="flex-shrink-0 px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg shadow-sm hover:bg-teal-600 disabled:bg-slate-400 dark:disabled:bg-slate-500"
+                                  disabled={!avatarUrlInput.trim()}
+                              >
+                                  Set
+                              </button>
+                         </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 };
