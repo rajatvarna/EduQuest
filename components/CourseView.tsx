@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { Course, Lesson, Question, User } from '../types';
-import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon, QuestionMarkCircleIcon, DocumentTextIcon, VideoCameraIcon, SparklesIcon } from './icons';
+import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon, QuestionMarkCircleIcon, DocumentTextIcon, VideoCameraIcon, SparklesIcon, CheckIcon } from './icons';
 
 interface CourseViewProps {
   course: Course;
@@ -12,9 +12,10 @@ interface CourseViewProps {
   onBack: () => void;
   completedLessonIds: Set<string>;
   userAnswers: Record<string, boolean>;
+  onMarkAsComplete: (lessonId: string) => void;
 }
 
-const CourseView: React.FC<CourseViewProps> = ({ course, user, onStartLesson, onUpdateCourse, userHearts, onBack, completedLessonIds, userAnswers }) => {
+const CourseView: React.FC<CourseViewProps> = ({ course, user, onStartLesson, onUpdateCourse, userHearts, onBack, completedLessonIds, userAnswers, onMarkAsComplete }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
 
@@ -213,33 +214,44 @@ Provide your output as a single, valid JSON object matching the schema.`;
                         <p className="text-slate-500 dark:text-slate-400 mt-2">{
                            lesson.title.toLowerCase().includes('review') ? 'A special lesson to help you improve.' : getLessonDescription(lesson.type)}</p>
                       </div>
-                      <button
-                          onClick={() => onStartLesson(lesson)}
-                          disabled={isLocked}
-                          className={`mt-6 self-start inline-flex items-center justify-center px-4 py-2 font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:cursor-not-allowed ${
-                            lesson.title.toLowerCase().includes('review') && !isLocked
-                            ? 'text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shadow-md hover:shadow-lg focus:ring-indigo-500'
-                            : isCompleted 
-                            ? 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 focus:ring-slate-500'
-                            : isLocked
-                            ? 'bg-slate-300 dark:bg-slate-600 text-slate-500'
-                            : 'text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-md hover:shadow-lg focus:ring-cyan-500'
-                          }`}
-                      >
-                          {isCompleted ? (
-                             <>
-                               <ArrowPathIcon className="w-5 h-5 mr-2"/> Review
-                             </>
-                          ) : isLocked ? (
-                             <>
-                                <LockClosedIcon className="w-5 h-5 mr-2"/> No Hearts
-                             </>
-                          ) : (
-                             <>
-                               <PlayCircleIcon className="w-5 h-5 mr-2"/> Start
-                             </>
+                       <div className="mt-6 self-start flex items-center gap-2">
+                          <button
+                              onClick={() => onStartLesson(lesson)}
+                              disabled={isLocked}
+                              className={`inline-flex items-center justify-center px-4 py-2 font-semibold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:cursor-not-allowed ${
+                                lesson.title.toLowerCase().includes('review') && !isLocked
+                                ? 'text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shadow-md hover:shadow-lg focus:ring-indigo-500'
+                                : isCompleted 
+                                ? 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 focus:ring-slate-500'
+                                : isLocked
+                                ? 'bg-slate-300 dark:bg-slate-600 text-slate-500'
+                                : 'text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-md hover:shadow-lg focus:ring-cyan-500'
+                              }`}
+                          >
+                              {isCompleted ? (
+                                 <>
+                                   <ArrowPathIcon className="w-5 h-5 mr-2"/> Review
+                                 </>
+                              ) : isLocked ? (
+                                 <>
+                                    <LockClosedIcon className="w-5 h-5 mr-2"/> No Hearts
+                                 </>
+                              ) : (
+                                 <>
+                                   <PlayCircleIcon className="w-5 h-5 mr-2"/> Start
+                                 </>
+                              )}
+                          </button>
+                          {(lesson.type === 'READING' || lesson.type === 'VIDEO') && !isCompleted && !isLocked && (
+                            <button
+                                onClick={() => onMarkAsComplete(lesson.id)}
+                                title="Mark as Complete"
+                                className="p-2 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-slate-500"
+                            >
+                                <CheckIcon className="w-5 h-5" />
+                            </button>
                           )}
-                      </button>
+                      </div>
                   </div>
               </li>
             )

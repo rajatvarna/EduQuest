@@ -202,6 +202,24 @@ const App: React.FC = () => {
     setActiveLesson(null);
   }, [activeCourse, completedLessonIds, user, userStats]);
 
+  const markLessonAsComplete = useCallback(async (lessonId: string) => {
+    const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
+    if (!lesson || !user) return;
+    
+    const wasAlreadyCompleted = completedLessonIds.has(lessonId);
+    if (wasAlreadyCompleted) return;
+
+    const { updatedUserStats, updatedCompletedLessonIds } = await api.completeLesson({
+        userId: user.id,
+        lessonId,
+        xpEarned: 0, // No XP for quick-marking
+        wasAlreadyCompleted: false
+    });
+
+    setUserStats(updatedUserStats);
+    setCompletedLessonIds(new Set(updatedCompletedLessonIds));
+  }, [activeCourse, completedLessonIds, user]);
+
   const handleCloseCompleteModal = () => {
     setLessonCompleteData(null);
     setView('course_view');
@@ -260,6 +278,7 @@ const App: React.FC = () => {
             completedLessonIds={completedLessonIds}
             userAnswers={userAnswers}
             onUpdateCourse={handleUpdateCourse}
+            onMarkAsComplete={markLessonAsComplete}
         />;
       case 'lesson':
         if (!activeLesson || !userStats) {
