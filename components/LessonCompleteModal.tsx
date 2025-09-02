@@ -1,5 +1,6 @@
 import React from 'react';
 import { StarIcon, FlameIcon } from './icons';
+import Confetti from './Confetti';
 
 interface LessonCompleteModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
         className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all animate-jump-in relative overflow-hidden border border-slate-200 dark:border-slate-700"
         onClick={e => e.stopPropagation()}
       >
+        {isOpen && <Confetti />}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_#2dd4bf_0%,_transparent_40%)] animate-beams opacity-20 dark:opacity-10"></div>
         <div className="relative z-10">
             <h2 className="text-3xl font-bold text-teal-500 mb-4">Lesson Complete!</h2>

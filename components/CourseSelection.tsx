@@ -25,7 +25,7 @@ const CourseSelection: React.FC<CourseSelectionProps> = ({ courses, onSelectCour
             <button
               key={course.id}
               onClick={() => onSelectCourse(course)}
-              className="group text-left p-6 bg-white dark:bg-slate-800/80 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-teal-500 transform hover:scale-[1.03]"
+              className="group text-left p-6 bg-white dark:bg-slate-800/80 bg-grid-pattern dark:bg-grid-pattern-dark rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-950 focus:ring-teal-500 transform hover:scale-[1.03]"
             >
               <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-teal-100 to-cyan-200 dark:from-teal-900/70 dark:to-cyan-900/70 rounded-lg flex items-center justify-center mr-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
