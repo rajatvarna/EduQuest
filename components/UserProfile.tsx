@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, UserStats, LevelInfo } from '../types';
-import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon, XMarkIcon } from './icons';
+import { User, UserStats, LevelInfo, Achievement } from '../types';
+import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon, XMarkIcon, TrophyIcon } from './icons';
 import ActivityHeatmap from './ActivityHeatmap';
+import AchievementsPanel from './AchievementsPanel';
 import { useToast } from './ToastContext';
 
 interface UserProfileProps {
   user: User;
   userStats: UserStats;
   levelInfo: LevelInfo;
+  achievements: Achievement[];
   onUpdateUser: (updatedUser: User) => Promise<void>;
   onLogout: () => void;
   onNavigateHome: () => void;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, onUpdateUser, onLogout, onNavigateHome }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, achievements, onUpdateUser, onLogout, onNavigateHome }) => {
   const { showToast } = useToast();
+  const [activeTab, setActiveTab] = useState<'stats' | 'achievements'>('stats');
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
   const [isSaving, setIsSaving] = useState(false);
@@ -179,25 +182,63 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-            <h3 className="text-xl font-semibold mb-4 text-center">Your Stats</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <StatCard icon={<StarIcon className="w-6 h-6 text-yellow-800 dark:text-yellow-300" />} label="Total XP" value={userStats.xp} color="bg-yellow-200 dark:bg-yellow-500/20" />
-                <StatCard icon={<FlameIcon className="w-6 h-6 text-orange-800 dark:text-orange-300" />} label="Streak" value={userStats.streak} color="bg-orange-200 dark:bg-orange-500/20" />
-                <StatCard icon={<HeartIcon className="w-6 h-6 text-red-800 dark:text-red-300" />} label="Hearts" value={userStats.hearts} color="bg-red-200 dark:bg-red-500/20" />
+            <div className="flex justify-center gap-2 mb-6">
+                <button
+                    onClick={() => setActiveTab('stats')}
+                    className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                        activeTab === 'stats'
+                            ? 'bg-teal-500 text-white shadow-md'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    }`}
+                >
+                    <span className="flex items-center gap-2">
+                        <StarIcon className="w-5 h-5" />
+                        Stats
+                    </span>
+                </button>
+                <button
+                    onClick={() => setActiveTab('achievements')}
+                    className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                        activeTab === 'achievements'
+                            ? 'bg-teal-500 text-white shadow-md'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    }`}
+                >
+                    <span className="flex items-center gap-2">
+                        <TrophyIcon className="w-5 h-5" />
+                        Achievements
+                    </span>
+                </button>
             </div>
-            
-            <div className="mt-6 text-center">
-                 <p className="text-slate-500 dark:text-slate-400">Level Progress</p>
-                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-2">
-                    <div className="bg-teal-500 h-3 rounded-full" style={{width: `${levelInfo.progress}%`}}></div>
-                 </div>
-                 <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">{levelInfo.xpInLevel} / {levelInfo.xpForNextLevel} XP</p>
-            </div>
-        </div>
-        
-        <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-            <h3 className="text-xl font-semibold mb-4 text-center">Learning Activity</h3>
-            <ActivityHeatmap data={activityData} />
+
+            {activeTab === 'stats' ? (
+                <>
+                    <h3 className="text-xl font-semibold mb-4 text-center">Your Stats</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <StatCard icon={<StarIcon className="w-6 h-6 text-yellow-800 dark:text-yellow-300" />} label="Total XP" value={userStats.xp} color="bg-yellow-200 dark:bg-yellow-500/20" />
+                        <StatCard icon={<FlameIcon className="w-6 h-6 text-orange-800 dark:text-orange-300" />} label="Streak" value={userStats.streak} color="bg-orange-200 dark:bg-orange-500/20" />
+                        <StatCard icon={<HeartIcon className="w-6 h-6 text-red-800 dark:text-red-300" />} label="Hearts" value={userStats.hearts} color="bg-red-200 dark:bg-red-500/20" />
+                    </div>
+
+                    <div className="mt-6 text-center">
+                        <p className="text-slate-500 dark:text-slate-400">Level Progress</p>
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 mt-2">
+                            <div className="bg-teal-500 h-3 rounded-full" style={{width: `${levelInfo.progress}%`}}></div>
+                        </div>
+                        <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">{levelInfo.xpInLevel} / {levelInfo.xpForNextLevel} XP</p>
+                    </div>
+
+                    <div className="mt-6">
+                        <h3 className="text-xl font-semibold mb-4 text-center">Learning Activity</h3>
+                        <ActivityHeatmap data={activityData} />
+                    </div>
+                </>
+            ) : (
+                <>
+                    <h3 className="text-xl font-semibold mb-4 text-center">Your Achievements</h3>
+                    <AchievementsPanel achievements={achievements} userStats={userStats} />
+                </>
+            )}
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 flex justify-center">

@@ -210,7 +210,27 @@ Provide your output as a single, valid JSON object matching the schema.`;
                     lesson.title.toLowerCase().includes('review') ? 'border-purple-500/40' : 'border-slate-200 dark:border-slate-700'
                   } flex flex-col ${isCompleted ? 'opacity-80' : isLocked ? 'cursor-not-allowed opacity-60' : 'hover:-translate-y-1 hover:shadow-xl hover:border-teal-500/40'}`}>
                       <div className="flex-grow">
-                        <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
+                          <div className="flex gap-2 flex-shrink-0">
+                            {lesson.difficulty && (
+                              <span className={`text-xs font-bold px-2 py-1 rounded ${
+                                lesson.difficulty === 'BEGINNER'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                  : lesson.difficulty === 'INTERMEDIATE'
+                                  ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                              }`}>
+                                {lesson.difficulty}
+                              </span>
+                            )}
+                            {lesson.estimatedDuration && (
+                              <span className="text-xs font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                {lesson.estimatedDuration} min
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         <p className="text-slate-500 dark:text-slate-400 mt-2">{
                            lesson.title.toLowerCase().includes('review') ? 'A special lesson to help you improve.' : getLessonDescription(lesson.type)}</p>
                       </div>
