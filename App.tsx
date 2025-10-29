@@ -14,7 +14,6 @@ import LessonCompleteModal from './components/LessonCompleteModal';
 import UserProfile from './components/UserProfile';
 import QuestBot from './components/QuestBot';
 import { ChatBubbleLeftRightIcon } from './components/icons';
-import { useToast } from './components/ToastContext';
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
@@ -37,7 +36,6 @@ const calculateLevelInfo = (xp: number): LevelInfo => {
 
 
 const App: React.FC = () => {
-  const { showToast } = useToast();
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [levelInfo, setLevelInfo] = useState<LevelInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -251,7 +249,6 @@ const App: React.FC = () => {
   const refillHearts = () => {
     if (!userStats) return;
     setUserStats(prev => prev ? ({...prev, hearts: 5}) : null);
-    showToast('Hearts refilled!', 'hearts', 2000);
     setIsModalOpen(false);
   }
   

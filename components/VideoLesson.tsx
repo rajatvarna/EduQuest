@@ -3,7 +3,6 @@ import YouTube from 'react-youtube';
 import type { YouTubePlayer, YouTubeProps } from 'react-youtube';
 import { Lesson, VideoInteraction, Question } from '../types';
 import { ArrowLeftIcon, PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon, XMarkIcon, CheckIcon } from './icons';
-import { useToast } from './ToastContext';
 
 interface InteractionModalProps {
     interaction: VideoInteraction;
@@ -88,7 +87,6 @@ interface VideoLessonProps {
 }
 
 const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit }) => {
-  const { showToast } = useToast();
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -238,9 +236,6 @@ const VideoLesson: React.FC<VideoLessonProps> = ({ lesson, onComplete, onExit })
   
   const handleInteractionAnswer = (isCorrect: boolean) => {
       if (activeInteraction) {
-          if (isCorrect) {
-              showToast('+10 XP', 'xp', 2000);
-          }
           setCompletedInteractions(prev => new Set(prev).add(activeInteraction.question.id));
           setActiveInteraction(null);
           player?.playVideo();
