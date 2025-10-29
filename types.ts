@@ -2,6 +2,10 @@ export interface UserStats {
   xp: number;
   streak: number;
   hearts: number;
+  lastActivityDate?: string; // ISO date string for streak calculation
+  streakMultiplier?: number; // XP multiplier based on streak milestones
+  totalLessonsCompleted?: number;
+  totalCoursesCompleted?: number;
 }
 
 export interface LevelInfo {
@@ -68,6 +72,8 @@ export interface VideoInteraction {
     question: MultipleChoiceQuestion;
 }
 
+export type LessonDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
 export interface Lesson {
   id:string;
   title: string;
@@ -77,10 +83,71 @@ export interface Lesson {
   videoId?: string; // For VIDEO type (e.g., YouTube video ID)
   transcript?: TranscriptItem[];
   videoInteractions?: VideoInteraction[];
+  difficulty?: LessonDifficulty;
+  estimatedDuration?: number; // in minutes
 }
+
+export type CourseCategory = 'PROGRAMMING' | 'SCIENCE' | 'LANGUAGES' | 'BUSINESS' | 'ARTS' | 'MATH' | 'OTHER';
 
 export interface Course {
   id:string;
   title: string;
   lessons: Lesson[];
+  description?: string;
+  category?: CourseCategory;
+  difficulty?: LessonDifficulty;
+  imageUrl?: string;
+}
+
+// Achievement System
+export type AchievementCondition =
+  | 'FIRST_LESSON'
+  | 'COURSE_COMPLETE'
+  | 'PERFECT_SCORE'
+  | 'STREAK_7'
+  | 'STREAK_30'
+  | 'STREAK_100'
+  | 'LESSONS_10'
+  | 'LESSONS_50'
+  | 'LESSONS_100'
+  | 'XP_1000'
+  | 'XP_5000'
+  | 'ALL_QUESTION_TYPES';
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string; // emoji or icon name
+  condition: AchievementCondition;
+  reward: number; // bonus XP
+  unlockedAt?: string; // ISO date string
+}
+
+// Daily Quest System
+export type QuestType =
+  | 'COMPLETE_LESSONS'
+  | 'ANSWER_QUESTIONS'
+  | 'MAINTAIN_STREAK'
+  | 'EARN_XP'
+  | 'PERFECT_SCORES';
+
+export interface DailyQuest {
+  id: string;
+  title: string;
+  description: string;
+  type: QuestType;
+  target: number; // e.g., 3 lessons, 10 questions
+  progress: number;
+  reward: number; // bonus XP
+  completed: boolean;
+  date: string; // ISO date string for the day this quest is active
+}
+
+// Streak Milestone
+export interface StreakMilestone {
+  days: number;
+  title: string;
+  multiplier: number; // XP multiplier (e.g., 1.2 = 20% bonus)
+  badge: string; // emoji
 }

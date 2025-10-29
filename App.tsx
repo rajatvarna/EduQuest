@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Course, Lesson, UserStats, User, LevelInfo } from './types';
+import { Course, Lesson, UserStats, User, LevelInfo, Achievement, DailyQuest } from './types';
 import * as api from './services/api';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
@@ -12,8 +12,15 @@ import Auth from './components/Auth';
 import AdminDashboard from './components/AdminDashboard';
 import LessonCompleteModal from './components/LessonCompleteModal';
 import UserProfile from './components/UserProfile';
+import DailyQuestsPanel from './components/DailyQuestsPanel';
 import QuestBot from './components/QuestBot';
 import { ChatBubbleLeftRightIcon } from './components/icons';
+<<<<<<< HEAD
+=======
+import { useToast } from './components/ToastContext';
+import { getNewlyUnlockedAchievements, calculateXPWithMultiplier, getCurrentStreakMilestone } from './services/achievements';
+import { loadQuestsFromStorage, saveQuestsToStorage, updateQuestProgress, shouldResetQuests, generateDailyQuests } from './services/quests';
+>>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
@@ -52,6 +59,12 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
+  // Gamification state
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
+  const [perfectScores, setPerfectScores] = useState(0);
+  const [questPanelOpen, setQuestPanelOpen] = useState(false);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -85,6 +98,27 @@ const App: React.FC = () => {
       };
       fetchCourses();
   }, [isAuthenticated]);
+
+  // Load gamification data when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Load achievements
+      const storedAchievements = localStorage.getItem(`achievements_${user.id}`);
+      if (storedAchievements) {
+        setAchievements(JSON.parse(storedAchievements));
+      }
+
+      // Load perfect scores count
+      const storedPerfectScores = localStorage.getItem(`perfectScores_${user.id}`);
+      if (storedPerfectScores) {
+        setPerfectScores(parseInt(storedPerfectScores));
+      }
+
+      // Load and possibly reset daily quests
+      const quests = loadQuestsFromStorage();
+      setDailyQuests(quests);
+    }
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -156,13 +190,18 @@ const App: React.FC = () => {
 
   const handleAnswer = useCallback(async (questionId: string, isCorrect: boolean) => {
     if (!userStats || !user) return;
-    
+
     // Record the answer
     const updatedAnswers = await api.recordAnswer({ userId: user.id, questionId, isCorrect });
     setUserAnswers(updatedAnswers);
 
     if (isCorrect) {
       setUserStats(prev => prev ? ({ ...prev, xp: prev.xp + 10 }) : null);
+
+      // Update quest progress for correct answers
+      const updatedQuests = updateQuestProgress(dailyQuests, 'ANSWER_QUESTIONS', 1);
+      setDailyQuests(updatedQuests);
+      saveQuestsToStorage(updatedQuests);
     } else {
       setUserStats(prev => {
         if (!prev) return null;
@@ -173,21 +212,25 @@ const App: React.FC = () => {
         return { ...prev, hearts: newHearts };
       });
     }
-  }, [user, userStats]);
+  }, [user, userStats, dailyQuests]);
 
   const completeLesson = useCallback(async (lessonId: string) => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
     if (!lesson || !user || !userStats) return;
 
-    let xpEarned = 0;
+    // Calculate base XP
+    let baseXP = 0;
     if (lesson.type === 'QUIZ' && lesson.questions) {
-      xpEarned = lesson.questions.length * 10;
+      baseXP = lesson.questions.length * 10;
     } else if (lesson.type === 'READING' || lesson.type === 'VIDEO') {
-      xpEarned = 15;
+      baseXP = 15;
     }
-    
+
+    // Apply streak multiplier
+    const xpEarned = calculateXPWithMultiplier(baseXP, userStats.streak);
+
     const wasAlreadyCompleted = completedLessonIds.has(lessonId);
-    
+
     const { updatedUserStats, updatedCompletedLessonIds } = await api.completeLesson({
         userId: user.id,
         lessonId,
@@ -197,10 +240,75 @@ const App: React.FC = () => {
 
     setUserStats(updatedUserStats);
     setCompletedLessonIds(new Set(updatedCompletedLessonIds));
-    
+
+    // Update daily quests
+    if (!wasAlreadyCompleted) {
+      let updatedQuests = updateQuestProgress(dailyQuests, 'COMPLETE_LESSONS', 1);
+      updatedQuests = updateQuestProgress(updatedQuests, 'EARN_XP', xpEarned);
+
+      // Check for perfect score in quiz
+      if (lesson.type === 'QUIZ' && lesson.questions) {
+        const allCorrect = lesson.questions.every(q => userAnswers[q.id] === true);
+        if (allCorrect) {
+          updatedQuests = updateQuestProgress(updatedQuests, 'PERFECT_SCORES', 1);
+          setPerfectScores(prev => prev + 1);
+          localStorage.setItem(`perfectScores_${user.id}`, (perfectScores + 1).toString());
+        }
+      }
+
+      setDailyQuests(updatedQuests);
+      saveQuestsToStorage(updatedQuests);
+
+      // Check for newly completed quests
+      const newlyCompletedQuests = updatedQuests.filter((q, idx) =>
+        q.completed && !dailyQuests[idx].completed
+      );
+      newlyCompletedQuests.forEach(quest => {
+        showToast(`Quest Complete: ${quest.title}!`, 'success', 3000);
+      });
+
+      // Check for achievements
+      const questionTypesAnswered = new Set(
+        Object.keys(userAnswers).map(qId => {
+          // Find question type from all courses
+          for (const course of courses) {
+            for (const l of course.lessons) {
+              const q = l.questions?.find(question => question.id === qId);
+              if (q) return q.type;
+            }
+          }
+          return '';
+        }).filter(Boolean)
+      );
+
+      const coursesCompleted = courses.filter(course =>
+        course.lessons.every(l => updatedCompletedLessonIds.includes(l.id))
+      ).length;
+
+      const newAchievements = getNewlyUnlockedAchievements(achievements, {
+        lessonsCompleted: updatedCompletedLessonIds.length,
+        coursesCompleted,
+        streak: updatedUserStats.streak,
+        xp: updatedUserStats.xp,
+        perfectScores: perfectScores + (lesson.type === 'QUIZ' && lesson.questions?.every(q => userAnswers[q.id] === true) ? 1 : 0),
+        questionTypesAnswered,
+      });
+
+      if (newAchievements.length > 0) {
+        const allAchievements = [...achievements, ...newAchievements];
+        setAchievements(allAchievements);
+        localStorage.setItem(`achievements_${user.id}`, JSON.stringify(allAchievements));
+
+        // Show achievement notifications
+        newAchievements.forEach(achievement => {
+          showToast(`🏆 ${achievement.title} unlocked! +${achievement.reward} XP`, 'success', 4000);
+        });
+      }
+    }
+
     setLessonCompleteData({ xpEarned });
     setActiveLesson(null);
-  }, [activeCourse, completedLessonIds, user, userStats]);
+  }, [activeCourse, completedLessonIds, user, userStats, dailyQuests, achievements, userAnswers, courses, perfectScores, showToast]);
 
   const markLessonAsComplete = useCallback(async (lessonId: string) => {
     const lesson = activeCourse?.lessons.find(l => l.id === lessonId);
@@ -318,10 +426,11 @@ const App: React.FC = () => {
              handleLogout(); // Should not happen if authenticated, but as fallback
              return null;
          }
-         return <UserProfile 
+         return <UserProfile
             user={user}
             userStats={userStats}
             levelInfo={levelInfo}
+            achievements={achievements}
             onUpdateUser={handleUpdateUser}
             onLogout={handleLogout}
             onNavigateHome={handleNavigateHome}
@@ -337,12 +446,13 @@ const App: React.FC = () => {
         <Auth onLogin={handleLogin} onRegister={handleRegister} />
       ) : userStats && levelInfo ? (
         <>
-          <Header 
-            userStats={userStats} 
+          <Header
+            userStats={userStats}
             levelInfo={levelInfo}
             onNavigateToAdmin={() => setView('admin')}
             onNavigateHome={handleNavigateHome}
             onNavigateToProfile={() => setView('profile')}
+            onToggleQuests={() => setQuestPanelOpen(!questPanelOpen)}
             theme={theme}
             toggleTheme={toggleTheme}
           />
@@ -357,7 +467,7 @@ const App: React.FC = () => {
           />
           
           {lessonCompleteData && (
-            <LessonCompleteModal 
+            <LessonCompleteModal
               isOpen={!!lessonCompleteData}
               onClose={handleCloseCompleteModal}
               xpEarned={lessonCompleteData.xpEarned}
@@ -365,7 +475,13 @@ const App: React.FC = () => {
             />
           )}
 
-          <QuestBot 
+          <DailyQuestsPanel
+            isOpen={questPanelOpen}
+            onClose={() => setQuestPanelOpen(false)}
+            quests={dailyQuests}
+          />
+
+          <QuestBot
             isOpen={isChatbotOpen}
             onClose={() => setIsChatbotOpen(false)}
             activeLesson={activeLesson}

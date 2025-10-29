@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserStats, LevelInfo } from '../types';
-import { StarIcon, FlameIcon, HeartIcon, UserCircleIcon, WrenchScrewdriverIcon, SunIcon, MoonIcon, EduQuestLogo } from './icons';
+import { StarIcon, FlameIcon, HeartIcon, UserCircleIcon, WrenchScrewdriverIcon, SunIcon, MoonIcon, EduQuestLogo, TrophyIcon } from './icons';
 
 interface HeaderProps {
   userStats: UserStats;
@@ -8,11 +8,12 @@ interface HeaderProps {
   onNavigateToAdmin: () => void;
   onNavigateHome: () => void;
   onNavigateToProfile: () => void;
+  onToggleQuests: () => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userStats, levelInfo, onNavigateToAdmin, onNavigateHome, onNavigateToProfile, theme, toggleTheme }) => {
+const Header: React.FC<HeaderProps> = ({ userStats, levelInfo, onNavigateToAdmin, onNavigateHome, onNavigateToProfile, onToggleQuests, theme, toggleTheme }) => {
   return (
     <header className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center max-w-5xl">
@@ -43,6 +44,9 @@ const Header: React.FC<HeaderProps> = ({ userStats, levelInfo, onNavigateToAdmin
           
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
+          <button onClick={onToggleQuests} title="Daily Quests" className="p-2 rounded-full text-slate-500 hover:text-teal-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-teal-400 dark:hover:bg-slate-800">
+            <TrophyIcon className="h-6 w-6" />
+          </button>
           <button onClick={toggleTheme} title="Toggle Theme" className="p-2 rounded-full text-slate-500 hover:text-teal-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-teal-400 dark:hover:bg-slate-800">
             {theme === 'light' ? <MoonIcon className="h-6 w-6" /> : <SunIcon className="h-6 w-6" />}
           </button>

@@ -1,6 +1,11 @@
 import React from 'react';
 import { StarIcon, FlameIcon } from './icons';
 import Confetti from './Confetti';
+<<<<<<< HEAD
+=======
+import { useToast } from './ToastContext';
+import { getCurrentStreakMilestone } from '../services/achievements';
+>>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
 
 interface LessonCompleteModalProps {
   isOpen: boolean;
@@ -10,6 +15,20 @@ interface LessonCompleteModalProps {
 }
 
 const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak }) => {
+<<<<<<< HEAD
+=======
+  const { showToast } = useToast();
+  const streakMilestone = getCurrentStreakMilestone(currentStreak);
+
+  useEffect(() => {
+    if (isOpen && currentStreak > 0) {
+      setTimeout(() => {
+        showToast(`${currentStreak} day streak!`, 'streak', 3000);
+      }, 500);
+    }
+  }, [isOpen, currentStreak, showToast]);
+
+>>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
   if (!isOpen) return null;
 
   return (
@@ -41,6 +60,17 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
                         <span>{currentStreak}</span>
                     </div>
                 </div>
+                {streakMilestone && (
+                    <div className="bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 p-4 rounded-lg border-2 border-orange-300 dark:border-orange-600">
+                        <div className="text-center">
+                            <div className="text-3xl mb-1">{streakMilestone.badge}</div>
+                            <div className="font-bold text-orange-800 dark:text-orange-300">{streakMilestone.title}</div>
+                            <div className="text-sm text-orange-600 dark:text-orange-400 mt-1">
+                                {streakMilestone.multiplier}x XP Multiplier Active!
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <button
