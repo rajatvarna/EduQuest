@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, UserStats, LevelInfo } from '../types';
 import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon, XMarkIcon } from './icons';
 import ActivityHeatmap from './ActivityHeatmap';
+import { useToast } from './ToastContext';
 
 interface UserProfileProps {
   user: User;
@@ -13,6 +14,7 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, onUpdateUser, onLogout, onNavigateHome }) => {
+  const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +49,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
     if (isSaving || name.trim() === '' || name.trim() === user.name) return;
     setIsSaving(true);
     await onUpdateUser({ ...user, name: name.trim() });
+    showToast('Profile updated!', 'success', 2000);
     setIsSaving(false);
     setIsEditing(false);
   };
@@ -62,6 +65,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
       const reader = new FileReader();
       reader.onloadend = () => {
         onUpdateUser({ ...user, avatarUrl: reader.result as string });
+        showToast('Avatar updated!', 'success', 2000);
         setIsAvatarModalOpen(false);
       };
       reader.readAsDataURL(file);
@@ -74,10 +78,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, o
         // Basic validation for URL format
         new URL(avatarUrlInput);
         onUpdateUser({ ...user, avatarUrl: avatarUrlInput.trim() });
+        showToast('Avatar updated!', 'success', 2000);
         setIsAvatarModalOpen(false);
         setAvatarUrlInput('');
       } catch (_) {
-        alert("Please enter a valid image URL.");
+        showToast('Invalid URL', 'error', 2000);
       }
     }
   };

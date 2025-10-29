@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StarIcon, FlameIcon } from './icons';
 import Confetti from './Confetti';
+import { useToast } from './ToastContext';
 
 interface LessonCompleteModalProps {
   isOpen: boolean;
@@ -10,6 +11,16 @@ interface LessonCompleteModalProps {
 }
 
 const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak }) => {
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (isOpen && currentStreak > 0) {
+      setTimeout(() => {
+        showToast(`${currentStreak} day streak!`, 'streak', 3000);
+      }, 500);
+    }
+  }, [isOpen, currentStreak, showToast]);
+
   if (!isOpen) return null;
 
   return (

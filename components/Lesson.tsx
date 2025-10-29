@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { marked } from 'marked';
 import { Lesson, Question, MatchingItem } from '../types';
 import { CheckIcon, XMarkIcon, ArrowLeftIcon, ArrowPathIcon } from './icons';
+import { useToast } from './ToastContext';
 
 interface LessonProps {
   lesson: Lesson;
@@ -24,6 +25,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 
 const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onComplete, onExit, isCompleted }) => {
+  const { showToast } = useToast();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -100,10 +102,15 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
 
   const handleCheckAnswer = () => {
     if (!isAnswerComplete()) return;
-    
+
     const correct = checkIsCorrect();
     setIsCorrect(correct);
     setIsAnswerChecked(true);
+
+    // Show toast notification
+    if (correct) {
+        showToast('+10 XP', 'xp', 2000);
+    }
 
     // Don't charge hearts for reviewing a completed lesson
     if (!correct && !isCompleted) {
