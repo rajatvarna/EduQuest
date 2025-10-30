@@ -15,12 +15,9 @@ import UserProfile from './components/UserProfile';
 import DailyQuestsPanel from './components/DailyQuestsPanel';
 import QuestBot from './components/QuestBot';
 import { ChatBubbleLeftRightIcon } from './components/icons';
-<<<<<<< HEAD
-=======
 import { useToast } from './components/ToastContext';
 import { getNewlyUnlockedAchievements, calculateXPWithMultiplier, getCurrentStreakMilestone } from './services/achievements';
 import { loadQuestsFromStorage, saveQuestsToStorage, updateQuestProgress, shouldResetQuests, generateDailyQuests } from './services/quests';
->>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';

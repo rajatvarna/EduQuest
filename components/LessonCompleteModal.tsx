@@ -1,11 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StarIcon, FlameIcon } from './icons';
 import Confetti from './Confetti';
-<<<<<<< HEAD
-=======
 import { useToast } from './ToastContext';
 import { getCurrentStreakMilestone } from '../services/achievements';
->>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
 
 interface LessonCompleteModalProps {
   isOpen: boolean;
@@ -15,8 +12,6 @@ interface LessonCompleteModalProps {
 }
 
 const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak }) => {
-<<<<<<< HEAD
-=======
   const { showToast } = useToast();
   const streakMilestone = getCurrentStreakMilestone(currentStreak);
 
@@ -28,7 +23,6 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
     }
   }, [isOpen, currentStreak, showToast]);
 
->>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
   if (!isOpen) return null;
 
   return (

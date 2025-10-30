@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, UserStats, LevelInfo, Achievement } from '../types';
 import { StarIcon, FlameIcon, HeartIcon, PencilIcon, ArrowLeftOnRectangleIcon, CameraIcon, ArrowLeftIcon, UserCircleIcon, XMarkIcon, TrophyIcon } from './icons';
 import ActivityHeatmap from './ActivityHeatmap';
-<<<<<<< HEAD
-=======
 import AchievementsPanel from './AchievementsPanel';
 import { useToast } from './ToastContext';
->>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
 
 interface UserProfileProps {
   user: User;
@@ -18,13 +15,9 @@ interface UserProfileProps {
   onNavigateHome: () => void;
 }
 
-<<<<<<< HEAD
-const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, onUpdateUser, onLogout, onNavigateHome }) => {
-=======
 const UserProfile: React.FC<UserProfileProps> = ({ user, userStats, levelInfo, achievements, onUpdateUser, onLogout, onNavigateHome }) => {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'stats' | 'achievements'>('stats');
->>>>>>> origin/claude/small-feature-improvement-011CUb4k9y8UKAtTYVSgeYLv
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
   const [isSaving, setIsSaving] = useState(false);
