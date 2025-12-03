@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { marked } from 'marked';
 import { Lesson, Question, MatchingItem } from '../types';
 import { CheckIcon, XMarkIcon, ArrowLeftIcon, ArrowPathIcon } from './icons';
+import QuizSummary from './QuizSummary';
 
 interface LessonProps {
   lesson: Lesson;
@@ -27,6 +28,8 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, boolean>>({});
 
   // State for different answer types
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null); // For MCQ
@@ -100,10 +103,13 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
 
   const handleCheckAnswer = () => {
     if (!isAnswerComplete()) return;
-    
+
     const correct = checkIsCorrect();
     setIsCorrect(correct);
     setIsAnswerChecked(true);
+
+    // Track answer for summary
+    setQuizAnswers(prev => ({ ...prev, [currentQuestion.id]: correct }));
 
     // Don't charge hearts for reviewing a completed lesson
     if (!correct && !isCompleted) {
@@ -117,9 +123,28 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
     if (lesson.questions && currentIndex < lesson.questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      onComplete(lesson.id);
+      // Show summary instead of completing immediately
+      setShowSummary(true);
     }
   };
+
+  const handleContinueFromSummary = () => {
+    onComplete(lesson.id);
+  };
+
+  const handleReviewWrong = () => {
+    // Find first incorrect question
+    const firstIncorrectIndex = lesson.questions?.findIndex(q => quizAnswers[q.id] === false) ?? 0;
+    setCurrentIndex(firstIncorrectIndex);
+    setShowSummary(false);
+    setIsAnswerChecked(false);
+  };
+
+  // Calculate XP earned
+  const xpEarned = useMemo(() => {
+    if (!lesson.questions) return 0;
+    return lesson.questions.length * 10; // 10 XP per question
+  }, [lesson.questions]);
 
   const handleMatchingClick = (type: 'prompt' | 'answer', id: string) => {
     if (isAnswerChecked) return;
@@ -349,6 +374,17 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
             )}
         </div>
       </div>
+
+      {/* Quiz Summary Modal */}
+      {showSummary && (
+        <QuizSummary
+          lesson={lesson}
+          userAnswers={quizAnswers}
+          xpEarned={xpEarned}
+          onContinue={handleContinueFromSummary}
+          onReviewWrong={handleReviewWrong}
+        />
+      )}
     </div>
   );
 };
