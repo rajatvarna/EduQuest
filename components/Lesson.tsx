@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { marked } from 'marked';
 import { Lesson, Question, MatchingItem } from '../types';
-import { CheckIcon, XMarkIcon, ArrowLeftIcon, ArrowPathIcon } from './icons';
+import { CheckIcon, XMarkIcon, ArrowLeftIcon, ArrowPathIcon, QuestionMarkCircleIcon } from './icons';
 import QuizSummary from './QuizSummary';
+import QuestBot from './QuestBot';
 
 interface LessonProps {
   lesson: Lesson;
@@ -30,6 +31,7 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
   const [isCorrect, setIsCorrect] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, boolean>>({});
+  const [isQuestBotOpen, setIsQuestBotOpen] = useState(false);
 
   // State for different answer types
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null); // For MCQ
@@ -325,16 +327,24 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center mb-4">
-         <button onClick={onExit} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 mr-4">
+      <div className="flex items-center gap-2 mb-4">
+         <button onClick={onExit} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
              <ArrowLeftIcon className="w-6 h-6"/>
          </button>
-        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-4">
+        <div className="flex-grow bg-slate-200 dark:bg-slate-700 rounded-full h-4">
           <div
             className="bg-teal-500 h-4 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
+        <button
+          onClick={() => setIsQuestBotOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+          title="Get help with this question"
+        >
+          <QuestionMarkCircleIcon className="w-5 h-5" />
+          <span className="hidden sm:inline">Help</span>
+        </button>
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center p-4">
@@ -385,6 +395,14 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
           onReviewWrong={handleReviewWrong}
         />
       )}
+
+      {/* QuestBot Help */}
+      <QuestBot
+        isOpen={isQuestBotOpen}
+        onClose={() => setIsQuestBotOpen(false)}
+        activeLesson={lesson}
+        questionContext={currentQuestion?.text}
+      />
     </div>
   );
 };

@@ -12,9 +12,10 @@ interface QuestBotProps {
   isOpen: boolean;
   onClose: () => void;
   activeLesson: Lesson | null;
+  questionContext?: string; // Optional: specific question text for contextual help
 }
 
-const QuestBot: React.FC<QuestBotProps> = ({ isOpen, onClose, activeLesson }) => {
+const QuestBot: React.FC<QuestBotProps> = ({ isOpen, onClose, activeLesson, questionContext }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,18 +37,25 @@ const QuestBot: React.FC<QuestBotProps> = ({ isOpen, onClose, activeLesson }) =>
         
         let systemInstruction = "You are QuestBot, a friendly and encouraging AI tutor for the EduQuest learning platform. Your goal is to help users understand the course material without giving away direct answers to quiz questions. Explain concepts clearly, provide examples, and ask guiding questions to help the user arrive at the answer themselves. Keep your tone positive and supportive. Start every conversation with a friendly greeting.";
 
+        // If question context is provided, enhance the system instruction
+        if (questionContext) {
+          systemInstruction += `\n\nThe user is currently working on this question: "${questionContext}". Help them understand the concepts needed to answer it, but don't give away the answer directly. Instead, provide hints, explain related concepts, and ask guiding questions.`;
+        }
+
         const newChat = ai.chats.create({
           model: 'gemini-2.5-flash',
           config: {
             systemInstruction
           },
         });
-        
+
         setChat(newChat);
-        
+
         let firstMessage = 'Hi there! I\'m QuestBot. How can I help you today?';
-        if (activeLesson) {
-            firstMessage = `Hi! I see you're working on the lesson "${activeLesson.title}". Ask me anything about it!`;
+        if (questionContext) {
+          firstMessage = `Hi! I see you're stuck on a question. I'm here to help you understand the concepts without giving away the answer. What would you like to know?`;
+        } else if (activeLesson) {
+          firstMessage = `Hi! I see you're working on the lesson "${activeLesson.title}". Ask me anything about it!`;
         }
         setMessages([{ role: 'model', text: firstMessage }]);
         
@@ -56,7 +64,7 @@ const QuestBot: React.FC<QuestBotProps> = ({ isOpen, onClose, activeLesson }) =>
         setMessages([{ role: 'model', text: 'Sorry, I am unable to connect right now.' }]);
       }
     }
-  }, [isOpen, activeLesson]);
+  }, [isOpen, activeLesson, questionContext]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
