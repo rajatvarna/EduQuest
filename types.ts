@@ -151,3 +151,25 @@ export interface StreakMilestone {
   multiplier: number; // XP multiplier (e.g., 1.2 = 20% bonus)
   badge: string; // emoji
 }
+
+// Reading Lesson Annotations
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'purple';
+
+export interface Highlight {
+  id: string;
+  lessonId: string;
+  text: string;
+  color: HighlightColor;
+  startOffset: number;
+  endOffset: number;
+  createdAt: string; // ISO date string
+}
+
+export interface Note {
+  id: string;
+  lessonId: string;
+  text: string;
+  highlightId?: string; // Optional: link note to a specific highlight
+  createdAt: string; // ISO date string
+  updatedAt?: string; // ISO date string
+}
