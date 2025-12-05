@@ -19,6 +19,33 @@ const CourseView: React.FC<CourseViewProps> = ({ course, user, onStartLesson, on
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
 
+  // Calculate course progress statistics
+  const courseStats = useMemo(() => {
+    const totalLessons = course.lessons.length;
+    const completedLessons = course.lessons.filter(l => completedLessonIds.has(l.id)).length;
+    const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+    const totalEstimatedTime = course.lessons.reduce((sum, lesson) => sum + (lesson.estimatedDuration || 0), 0);
+    const completedTime = course.lessons
+      .filter(l => completedLessonIds.has(l.id))
+      .reduce((sum, lesson) => sum + (lesson.estimatedDuration || 0), 0);
+
+    const lessonsByType = {
+      QUIZ: course.lessons.filter(l => l.type === 'QUIZ').length,
+      READING: course.lessons.filter(l => l.type === 'READING').length,
+      VIDEO: course.lessons.filter(l => l.type === 'VIDEO').length,
+    };
+
+    return {
+      totalLessons,
+      completedLessons,
+      progressPercentage,
+      totalEstimatedTime,
+      completedTime,
+      lessonsByType,
+    };
+  }, [course.lessons, completedLessonIds]);
+
   const incorrectAnswers = useMemo(() => {
     const incorrect: Question[] = [];
     course.lessons.forEach(lesson => {
@@ -149,6 +176,136 @@ Provide your output as a single, valid JSON object matching the schema.`;
          </button>
         <h2 className="text-3xl font-bold text-slate-800 dark:text-white">{course.title}</h2>
         <p className="text-slate-500 dark:text-slate-400 mt-2">Complete the lessons to master the course!</p>
+      </div>
+
+      {/* Course Progress Summary */}
+      <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-teal-200 dark:border-teal-800/50 shadow-lg">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          {/* Circular Progress */}
+          <div className="relative flex-shrink-0">
+            <svg className="w-32 h-32 transform -rotate-90">
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                className="text-slate-200 dark:text-slate-700"
+              />
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={`${2 * Math.PI * 56}`}
+                strokeDashoffset={`${2 * Math.PI * 56 * (1 - courseStats.progressPercentage / 100)}`}
+                className="text-teal-500 transition-all duration-1000"
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-teal-600 dark:text-teal-400">
+                  {courseStats.progressPercentage}%
+                </div>
+                <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                  Complete
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+            {/* Lessons Progress */}
+            <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 text-center">
+              <div className="text-2xl font-bold text-slate-800 dark:text-white">
+                {courseStats.completedLessons}/{courseStats.totalLessons}
+              </div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Lessons
+              </div>
+            </div>
+
+            {/* Time Progress */}
+            {courseStats.totalEstimatedTime > 0 && (
+              <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-slate-800 dark:text-white">
+                  {courseStats.completedTime}/{courseStats.totalEstimatedTime}
+                </div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Minutes
+                </div>
+              </div>
+            )}
+
+            {/* Quizzes */}
+            {courseStats.lessonsByType.QUIZ > 0 && (
+              <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <QuestionMarkCircleIcon className="w-5 h-5 text-teal-500" />
+                  <div className="text-2xl font-bold text-slate-800 dark:text-white">
+                    {courseStats.lessonsByType.QUIZ}
+                  </div>
+                </div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Quizzes
+                </div>
+              </div>
+            )}
+
+            {/* Videos */}
+            {courseStats.lessonsByType.VIDEO > 0 && (
+              <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <VideoCameraIcon className="w-5 h-5 text-teal-500" />
+                  <div className="text-2xl font-bold text-slate-800 dark:text-white">
+                    {courseStats.lessonsByType.VIDEO}
+                  </div>
+                </div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Videos
+                </div>
+              </div>
+            )}
+
+            {/* Readings */}
+            {courseStats.lessonsByType.READING > 0 && (
+              <div className="bg-white dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <DocumentTextIcon className="w-5 h-5 text-teal-500" />
+                  <div className="text-2xl font-bold text-slate-800 dark:text-white">
+                    {courseStats.lessonsByType.READING}
+                  </div>
+                </div>
+                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Readings
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Course Progress
+            </span>
+            <span className="text-sm font-bold text-teal-600 dark:text-teal-400">
+              {courseStats.completedLessons} of {courseStats.totalLessons} lessons completed
+            </span>
+          </div>
+          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-teal-500 to-cyan-500 h-3 rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${courseStats.progressPercentage}%` }}
+            ></div>
+          </div>
+        </div>
       </div>
 
       {incorrectAnswers.length >= 2 && (
