@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Course, CourseCategory, LessonDifficulty } from '../types';
 import { BookOpenIcon, MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from './icons';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 interface CourseSelectionProps {
   courses: Course[];
@@ -15,6 +16,7 @@ const CourseSelection: React.FC<CourseSelectionProps> = ({ courses, onSelectCour
   const [selectedCategory, setSelectedCategory] = useState<CourseCategory | 'ALL'>('ALL');
   const [selectedDifficulty, setSelectedDifficulty] = useState<LessonDifficulty | 'ALL'>('ALL');
   const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('ALL');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter courses based on search and filters
   const filteredCourses = useMemo(() => {
@@ -56,6 +58,29 @@ const CourseSelection: React.FC<CourseSelectionProps> = ({ courses, onSelectCour
     setCompletionFilter('ALL');
   };
 
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: '/',
+      callback: () => {
+        searchInputRef.current?.focus();
+      },
+      description: 'Focus search'
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        if (searchQuery) {
+          setSearchQuery('');
+          searchInputRef.current?.blur();
+        } else if (hasActiveFilters) {
+          clearAllFilters();
+        }
+      },
+      description: 'Clear search or filters'
+    }
+  ]);
+
   return (
     <div className="animate-fade-in">
       <div className="text-center mb-10">
@@ -71,10 +96,11 @@ const CourseSelection: React.FC<CourseSelectionProps> = ({ courses, onSelectCour
             <MagnifyingGlassIcon className="h-5 w-5 text-slate-400" />
           </div>
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search courses by title or description..."
+            placeholder="Search courses by title or description... (Press / to focus)"
             className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
           />
           {searchQuery && (

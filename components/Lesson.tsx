@@ -4,6 +4,7 @@ import { Lesson, Question, MatchingItem } from '../types';
 import { CheckIcon, XMarkIcon, ArrowLeftIcon, ArrowPathIcon, QuestionMarkCircleIcon } from './icons';
 import QuizSummary from './QuizSummary';
 import QuestBot from './QuestBot';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 interface LessonProps {
   lesson: Lesson;
@@ -147,6 +148,55 @@ const QuizLesson: React.FC<LessonProps> = ({ lesson, userHearts, onAnswer, onCom
     if (!lesson.questions) return 0;
     return lesson.questions.length * 10; // 10 XP per question
   }, [lesson.questions]);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'Enter',
+      callback: () => {
+        if (showSummary) return; // Don't interfere with summary modal
+        const noHeartsLeft = userHearts === 0 && !isCorrect && isAnswerChecked && !isCompleted;
+        if (isAnswerChecked && !noHeartsLeft) {
+          handleNext();
+        } else if (isAnswerComplete()) {
+          handleCheckAnswer();
+        }
+      },
+      description: 'Check answer or proceed to next question',
+      preventDefault: true
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        if (isQuestBotOpen) {
+          setIsQuestBotOpen(false);
+        } else if (showSummary) {
+          return; // Let summary modal handle escape
+        } else {
+          onExit();
+        }
+      },
+      description: 'Exit quiz'
+    },
+    {
+      key: 'h',
+      callback: () => {
+        if (!showSummary) {
+          setIsQuestBotOpen(true);
+        }
+      },
+      description: 'Open QuestBot help'
+    },
+    {
+      key: '?',
+      callback: () => {
+        if (!showSummary) {
+          setIsQuestBotOpen(true);
+        }
+      },
+      description: 'Open QuestBot help'
+    }
+  ], !showSummary);
 
   const handleMatchingClick = (type: 'prompt' | 'answer', id: string) => {
     if (isAnswerChecked) return;
