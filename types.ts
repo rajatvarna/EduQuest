@@ -173,3 +173,12 @@ export interface Note {
   createdAt: string; // ISO date string
   updatedAt?: string; // ISO date string
 }
+
+// Lesson Bookmarks/Favorites
+export interface Bookmark {
+  lessonId: string;
+  courseId: string;
+  lessonTitle: string;
+  courseTitle: string;
+  createdAt: string; // ISO date string
+}

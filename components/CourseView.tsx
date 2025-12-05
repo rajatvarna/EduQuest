@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { Course, Lesson, Question, User } from '../types';
-import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon, QuestionMarkCircleIcon, DocumentTextIcon, VideoCameraIcon, SparklesIcon, CheckIcon } from './icons';
+import { LockClosedIcon, PlayCircleIcon, ArrowLeftIcon, CheckCircleIcon, ArrowPathIcon, QuestionMarkCircleIcon, DocumentTextIcon, VideoCameraIcon, SparklesIcon, CheckIcon, StarIcon } from './icons';
+import { isLessonBookmarked, toggleBookmark } from '../services/bookmarks';
 
 interface CourseViewProps {
   course: Course;
@@ -18,6 +19,31 @@ interface CourseViewProps {
 const CourseView: React.FC<CourseViewProps> = ({ course, user, onStartLesson, onUpdateCourse, userHearts, onBack, completedLessonIds, userAnswers, onMarkAsComplete }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [bookmarkedLessons, setBookmarkedLessons] = useState<Set<string>>(
+    new Set(course.lessons.filter(l => isLessonBookmarked(l.id)).map(l => l.id))
+  );
+  const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+
+  const handleToggleBookmark = (lesson: Lesson) => {
+    const isNowBookmarked = toggleBookmark(lesson.id, course.id, lesson.title, course.title);
+    setBookmarkedLessons(prev => {
+      const newSet = new Set(prev);
+      if (isNowBookmarked) {
+        newSet.add(lesson.id);
+      } else {
+        newSet.delete(lesson.id);
+      }
+      return newSet;
+    });
+  };
+
+  // Filter lessons based on bookmark filter
+  const filteredLessons = useMemo(() => {
+    if (showOnlyBookmarked) {
+      return course.lessons.filter(l => bookmarkedLessons.has(l.id));
+    }
+    return course.lessons;
+  }, [course.lessons, showOnlyBookmarked, bookmarkedLessons]);
 
   // Calculate course progress statistics
   const courseStats = useMemo(() => {
@@ -176,6 +202,19 @@ Provide your output as a single, valid JSON object matching the schema.`;
          </button>
         <h2 className="text-3xl font-bold text-slate-800 dark:text-white">{course.title}</h2>
         <p className="text-slate-500 dark:text-slate-400 mt-2">Complete the lessons to master the course!</p>
+        {bookmarkedLessons.size > 0 && (
+          <button
+            onClick={() => setShowOnlyBookmarked(!showOnlyBookmarked)}
+            className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+              showOnlyBookmarked
+                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-2 border-yellow-400 dark:border-yellow-600'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            <StarIcon className={`w-5 h-5 ${showOnlyBookmarked ? 'fill-yellow-400 text-yellow-400' : 'text-slate-500 dark:text-slate-400'}`} />
+            {showOnlyBookmarked ? 'Show All Lessons' : `Show Favorites (${bookmarkedLessons.size})`}
+          </button>
+        )}
       </div>
 
       {/* Course Progress Summary */}
@@ -341,7 +380,18 @@ Provide your output as a single, valid JSON object matching the schema.`;
         <div className="absolute left-4 top-4 bottom-4 w-0.5 border-l-2 border-dashed border-slate-300 dark:border-slate-700"></div>
 
         <ul className="space-y-10">
-          {course.lessons.map((lesson) => {
+          {filteredLessons.length === 0 && showOnlyBookmarked ? (
+            <li className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                <StarIcon className="h-8 w-8 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 dark:text-white mb-2">No favorites yet</h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-4">
+                Click the star icon next to a lesson to add it to your favorites
+              </p>
+            </li>
+          ) : (
+            filteredLessons.map((lesson) => {
             const isCompleted = completedLessonIds.has(lesson.id);
             const isQuiz = lesson.type === 'QUIZ';
             const isLocked = isQuiz && userHearts === 0 && !isCompleted;
@@ -368,7 +418,25 @@ Provide your output as a single, valid JSON object matching the schema.`;
                   } flex flex-col ${isCompleted ? 'opacity-80' : isLocked ? 'cursor-not-allowed opacity-60' : 'hover:-translate-y-1 hover:shadow-xl hover:border-teal-500/40'}`}>
                       <div className="flex-grow">
                         <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
+                          <div className="flex items-center gap-2 flex-grow">
+                            <h3 className="text-xl font-semibold text-slate-800 dark:text-white">{lesson.title}</h3>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleBookmark(lesson);
+                              }}
+                              className="flex-shrink-0 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group"
+                              title={bookmarkedLessons.has(lesson.id) ? 'Remove from favorites' : 'Add to favorites'}
+                            >
+                              <StarIcon
+                                className={`w-5 h-5 transition-all ${
+                                  bookmarkedLessons.has(lesson.id)
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-slate-400 dark:text-slate-500 group-hover:text-yellow-400 dark:group-hover:text-yellow-400'
+                                }`}
+                              />
+                            </button>
+                          </div>
                           <div className="flex gap-2 flex-shrink-0">
                             {lesson.difficulty && (
                               <span className={`text-xs font-bold px-2 py-1 rounded ${
@@ -432,7 +500,7 @@ Provide your output as a single, valid JSON object matching the schema.`;
                   </div>
               </li>
             )
-          })}
+          }))}
         </ul>
       </div>
     </div>
