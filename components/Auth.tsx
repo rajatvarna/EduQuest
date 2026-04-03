@@ -5,9 +5,10 @@ import { User } from '../types';
 interface AuthProps {
     onLogin: (credentials: Pick<User, 'email' | 'password'>) => Promise<void>;
     onRegister: (credentials: Pick<User, 'name' | 'email' | 'password'>) => Promise<void>;
+    challengeInviteText?: string | null;
 }
 
-const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
+const Auth: React.FC<AuthProps> = ({ onLogin, onRegister, challengeInviteText }) => {
     const [view, setView] = useState<'login' | 'signup' | 'forgotPassword'>('login');
     const [resetEmailSent, setResetEmailSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -115,6 +116,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin, onRegister }) => {
                     <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight mt-2">EduQuest</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-2">{isLoginView ? 'Welcome back! Please sign in.' : 'Create an account to start learning.'}</p>
                 </div>
+                {challengeInviteText && (
+                    <div className="mb-4 p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700">
+                        <p className="text-sm text-orange-800 dark:text-orange-300 font-medium">{challengeInviteText}</p>
+                    </div>
+                )}
                 {error && <p className="text-red-500 text-sm text-center mb-4 bg-red-100 dark:bg-red-900/30 p-2 rounded-md">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {isSignupView && (

@@ -151,3 +151,12 @@ export interface StreakMilestone {
   multiplier: number; // XP multiplier (e.g., 1.2 = 20% bonus)
   badge: string; // emoji
 }
+
+export interface SharedStreakChallenge {
+  id: string;
+  userId: string;
+  userName: string;
+  streak: number;
+  xpEarned: number;
+  createdAt: string;
+}

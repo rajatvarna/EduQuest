@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Course, Lesson, UserStats, User, LevelInfo, Achievement, DailyQuest } from './types';
+import { Course, Lesson, UserStats, User, LevelInfo, Achievement, DailyQuest, SharedStreakChallenge } from './types';
 import * as api from './services/api';
 import Header from './components/Header';
 import CourseSelection from './components/CourseSelection';
@@ -16,8 +16,9 @@ import DailyQuestsPanel from './components/DailyQuestsPanel';
 import QuestBot from './components/QuestBot';
 import { ChatBubbleLeftRightIcon } from './components/icons';
 import { useToast } from './components/ToastContext';
-import { getNewlyUnlockedAchievements, calculateXPWithMultiplier, getCurrentStreakMilestone } from './services/achievements';
+import { getNewlyUnlockedAchievements, calculateXPWithMultiplier } from './services/achievements';
 import { loadQuestsFromStorage, saveQuestsToStorage, updateQuestProgress, shouldResetQuests, generateDailyQuests } from './services/quests';
+import { trackEvent } from './services/analytics';
 
 type View = 'course_selection' | 'course_view' | 'lesson' | 'admin' | 'profile';
 type Theme = 'light' | 'dark';
@@ -61,6 +62,8 @@ const App: React.FC = () => {
   const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
   const [perfectScores, setPerfectScores] = useState(0);
   const [questPanelOpen, setQuestPanelOpen] = useState(false);
+  const [isSharingChallenge, setIsSharingChallenge] = useState(false);
+  const [activeChallengeShare, setActiveChallengeShare] = useState<SharedStreakChallenge | null>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -86,6 +89,22 @@ const App: React.FC = () => {
         }
     };
     checkSession();
+  }, []);
+
+  useEffect(() => {
+    const readSharedChallenge = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const shareId = params.get('challenge');
+      if (!shareId) return;
+
+      const sharedChallenge = await api.getStreakShare(shareId);
+      if (!sharedChallenge) return;
+
+      setActiveChallengeShare(sharedChallenge);
+      trackEvent('challenge_link_opened', { share_id: shareId, sharer_id: sharedChallenge.userId });
+    };
+
+    readSharedChallenge();
   }, []);
   
   useEffect(() => {
@@ -152,6 +171,14 @@ const App: React.FC = () => {
     setCompletedLessonIds(new Set());
     setUserAnswers({});
     setIsAuthenticated(true);
+
+    if (activeChallengeShare) {
+      trackEvent('invite_accepted', {
+        share_id: activeChallengeShare.id,
+        inviter_id: activeChallengeShare.userId,
+        new_user_id: data.user.id,
+      });
+    }
   }
   
   const handleLogout = () => {
@@ -356,6 +383,46 @@ const App: React.FC = () => {
     setUserStats(prev => prev ? ({...prev, hearts: 5}) : null);
     setIsModalOpen(false);
   }
+
+  const handleShareChallenge = useCallback(async () => {
+    if (!user || !userStats || !lessonCompleteData) return;
+    setIsSharingChallenge(true);
+    try {
+      const share = await api.createStreakShare({
+        userId: user.id,
+        userName: user.name,
+        streak: userStats.streak,
+        xpEarned: lessonCompleteData.xpEarned,
+      });
+      const shareUrl = `${window.location.origin}${window.location.pathname}?challenge=${share.id}`;
+      const shareText = `${user.name} just hit a ${userStats.streak}-day streak on EduQuest (+${lessonCompleteData.xpEarned} XP). Beat that streak: ${shareUrl}`;
+
+      trackEvent('share_clicked', {
+        share_id: share.id,
+        streak: userStats.streak,
+        xp_earned: lessonCompleteData.xpEarned,
+      });
+
+      if (navigator.share) {
+        await navigator.share({
+          title: 'EduQuest Streak Challenge',
+          text: shareText,
+          url: shareUrl,
+        });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareText);
+      } else {
+        window.prompt('Copy your challenge link:', shareText);
+      }
+
+      showToast('Challenge link ready! Invite sent 🚀', 'success', 3000);
+    } catch (error) {
+      console.error('Unable to share challenge', error);
+      showToast('Could not create challenge link right now.', 'error', 3000);
+    } finally {
+      setIsSharingChallenge(false);
+    }
+  }, [user, userStats, lessonCompleteData, showToast]);
   
   if (isLoading) {
       return (
@@ -440,7 +507,11 @@ const App: React.FC = () => {
   return (
     <div className="antialiased text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
       {!isAuthenticated ? (
-        <Auth onLogin={handleLogin} onRegister={handleRegister} />
+        <Auth
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          challengeInviteText={activeChallengeShare ? `${activeChallengeShare.userName} invited you to beat a ${activeChallengeShare.streak}-day streak challenge.` : null}
+        />
       ) : userStats && levelInfo ? (
         <>
           <Header
@@ -469,6 +540,8 @@ const App: React.FC = () => {
               onClose={handleCloseCompleteModal}
               xpEarned={lessonCompleteData.xpEarned}
               currentStreak={userStats.streak}
+              onShare={handleShareChallenge}
+              isSharing={isSharingChallenge}
             />
           )}
 

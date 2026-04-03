@@ -1,5 +1,5 @@
 import { initialCourses } from './courseService';
-import { Course, User, UserStats } from '../types';
+import { Course, User, UserStats, SharedStreakChallenge } from '../types';
 
 // --- MOCK DATABASE using localStorage ---
 const DB = {
@@ -36,6 +36,11 @@ if (!DB.getItem('userProgress')) {
 }
 if (!DB.getItem('userAnswers')) {
     DB.setItem('userAnswers', {});
+}
+
+
+if (!DB.getItem('streakShares')) {
+    DB.setItem('streakShares', {});
 }
 
 
@@ -227,4 +232,29 @@ export const completeLesson = async (
     DB.setItem('userProgress', allProgress);
 
     return { updatedUserStats: currentUserStats, updatedCompletedLessonIds: currentUserProgress };
+};
+
+export const createStreakShare = async ({ userId, userName, streak, xpEarned }: { userId: string; userName: string; streak: number; xpEarned: number }): Promise<SharedStreakChallenge> => {
+    await simulateNetwork(120);
+    const shareId = `share-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const share: SharedStreakChallenge = {
+        id: shareId,
+        userId,
+        userName,
+        streak,
+        xpEarned,
+        createdAt: new Date().toISOString(),
+    };
+
+    const allShares = DB.getItem<Record<string, SharedStreakChallenge>>('streakShares') || {};
+    allShares[shareId] = share;
+    DB.setItem('streakShares', allShares);
+
+    return share;
+};
+
+export const getStreakShare = async (shareId: string): Promise<SharedStreakChallenge | null> => {
+    await simulateNetwork(120);
+    const allShares = DB.getItem<Record<string, SharedStreakChallenge>>('streakShares') || {};
+    return allShares[shareId] || null;
 };

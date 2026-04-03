@@ -9,9 +9,11 @@ interface LessonCompleteModalProps {
   onClose: () => void;
   xpEarned: number;
   currentStreak: number;
+  onShare: () => Promise<void>;
+  isSharing: boolean;
 }
 
-const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak }) => {
+const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClose, xpEarned, currentStreak, onShare, isSharing }) => {
   const { showToast } = useToast();
   const streakMilestone = getCurrentStreakMilestone(currentStreak);
 
@@ -67,12 +69,21 @@ const LessonCompleteModal: React.FC<LessonCompleteModalProps> = ({ isOpen, onClo
                 )}
             </div>
 
-            <button
-              onClick={onClose}
-              className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-105 shadow-lg"
-            >
-              Continue
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={onShare}
+                disabled={isSharing}
+                className="w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all disabled:opacity-60"
+              >
+                {isSharing ? 'Creating share link...' : 'Share your streak challenge'}
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold rounded-xl hover:from-teal-600 hover:to-cyan-700 transition-all hover:scale-105 shadow-lg"
+              >
+                Continue
+              </button>
+            </div>
         </div>
       </div>
     </div>
